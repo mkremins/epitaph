@@ -40,8 +40,10 @@
     (fn [state]
       (let [new-stardate (inc (:stardate state))
             civs (mapv #(civ-tick % new-stardate) (:civs state))
-            ;; 1/100 chance of introducing a new civ each tick
-            civs (cond-> civs (zero? (rand-int 100)) (conj (gen-civ new-stardate)))]
+            ;; 1/50 chance to spawn a new civ if all are extinct, 1/250 chance otherwise
+            new-civ-chance (if (every? :extinct? civs) 20 4)
+            civs (cond-> civs (< (rand-int 1000) new-civ-chance)
+                              (conj (gen-civ new-stardate)))]
         {:civs civs
          :stardate new-stardate}))))
 
