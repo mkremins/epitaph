@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>fermi gardener</title>
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
+  <style>
+  * {
+    box-sizing: border-box;
+    font-family: "Source Sans Pro", sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  html {
+    background: #222;
+    color: #eee;
+  }
+  body {
+    padding: 1rem;
+  }
+  .stardate {
+    margin-bottom: 1rem;
+  }
+  .civ {
+    display: inline-block;
+    margin-bottom: 3rem;
+    margin-right: 3rem;
+    vertical-align: top;
+    width: 250px;
+  }
+  .civ.extinct .profile .name {
+    text-decoration: line-through;
+  }
+  .civ.extinct .enlighten {
+    display: none;
+  }
+  .civ .profile, .civ .enlighten {
+    margin-bottom: 1rem;
+  }
+  .enlighten a {
+    color: inherit;
+    display: block;
+  }
+  .event .title {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .event.extinction .title {
+    color: red;
+  }
+  .event .desc {
+    margin-bottom: 0.5rem;
+  }
+  .system {
+    font-style: italic;
+  }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="target/app.js"></script>
+</body>
+</html>
