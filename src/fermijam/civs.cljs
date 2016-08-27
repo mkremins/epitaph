@@ -61,89 +61,73 @@
        (:name civ) " civilization."))
 
 (defn extinct [civ crisis stardate]
-  (let [crisis-desc (desc-for-crisis civ crisis stardate)]
-    (-> civ
-        (assoc :extinct? true)
-        (update :events conj {:desc crisis-desc :extinction? true}))))
+  (-> civ
+      (assoc :extinct? true)
+      (update :events conj
+        {:desc (desc-for-crisis civ crisis stardate) :extinction? true})))
 
 ;;; techs
 
 (def all-techs
-  {"tool-making"
-   {:name "tool-making"
+  [{:name :tool-making
     :crisis-chance {:overhunting +10
                     :overfishing -5
                     :crop-failure -5}}
-   "agriculture"
-   {:name "agriculture"
+   {:name :agriculture
     :crisis-chance {:overhunting -5
                     :overfishing -5
                     :crop-failure +10}}
-   "fishing"
-   {:name "fishing"
+   {:name :fishing
     :crisis-chance {:overhunting -5
                     :overfishing +10
                     :crop-failure -5}}
-   "writing"
-   {:name "writing"
+   {:name :writing
     :crisis-chance {:war-over-metal -5}}
-   "fire"
-   {:name "fire"
-    :prereqs #{"tool-making"}
+   {:name :fire
+    :prereqs #{:tool-making}
     :crisis-chance {:forest-fire +2
-                    :food-illness -3}}})
+                    :food-illness -3}}])
 
-(defmulti desc-for-tech identity)
+(defmulti desc-for-tech (fn [_ tech _] (:name tech)))
 
-(defmethod desc-for-tech "tool-making" [_]
-  ["The " [:name] " use stone tools for many things, including as weapons "
-   "when hunting the wild " [:vocab :beast] "."])
+(defmethod desc-for-tech :tool-making [civ _ stardate]
+  (str "The " (:name civ) " use stone tools for many things, "
+       "including as weapons when hunting the wild "
+       (get-in civ [:vocab :beast]) "."))
 
-(defmethod desc-for-tech "agriculture" [_]
-  ["The " [:name] " have begun to cultivate crops. They are especially "
-   "fond of " [:vocab :crop] ", a kind of "
-   (rand-nth ["fast-growing" "slow-growing" "sweet" "sour" "hardy"
-              "tasty" "fleshy" "bitter" "colorful" "chewy" "tough"])
-   " "
-   (rand-nth ["fruit" "stalk" "leaf" "cactus" "flower" "vine"])
-   " that grows well in the soil of their native land."])
+(defmethod desc-for-tech :agriculture [civ _ stardate]
+  (str "The " (:name civ) " have begun to cultivate crops. "
+       "They are especially fond of " (get-in civ [:vocab :crop])
+       ", a kind of "
+       (rand-nth ["fast-growing" "slow-growing" "sweet" "sour" "hardy"
+                  "tasty" "fleshy" "bitter" "colorful" "chewy" "tough"])
+       " "
+       (rand-nth ["fruit" "stalk" "leaf" "cactus" "flower" "vine"])
+       " that grows well in the soil of " (get-in civ [:vocab :planet]) "."))
 
-(defmethod desc-for-tech "fishing" [_]
-  ["The " [:name] " have learned how to catch water-dwelling creatures, "
-   "such as the " [:vocab :fish] ", for food."])
+(defmethod desc-for-tech :fishing [civ _ stardate]
+  (str "The " (:name civ) " have learned how to catch water-dwelling creatures, "
+       "such as the " (get-in civ [:vocab :fish]) ", for food."))
 
-(defmethod desc-for-tech "writing" [_]
-  ["The " [:name] " have developed a simple system of writing, "
-   "which they use primarily for "
-   (rand-nth ["poetry" "record-keeping" "storytelling" "worship"])
-   "."])
+(defmethod desc-for-tech :writing [civ _ stardate]
+  (str "The " (:name civ) " have developed a simple system of writing, "
+       "which they use primarily for "
+       (rand-nth ["poetry" "record-keeping" "storytelling" "worship"]) "."))
 
-(defmethod desc-for-tech "fire" [_]
-  ["The " [:name] " have learned the secrets of fire. "
-   "They use it to cook their food, and to light their villages at night."])
-
-(defn tech-info [tech]
-  (assoc (all-techs tech) :desc (desc-for-tech tech)))
-
-(defn has-prereqs? [civ tech]
-  (every? #(contains? (:knowledge civ) %) (:prereqs (tech-info tech))))
+(defmethod desc-for-tech :fire [civ _ stardate]
+  (str "The " (:name civ) " have learned the secrets of fire. "
+       "They use it to cook their food, and to light their villages at night."))
 
 (defn possible-techs [civ]
-  (->> (keys all-techs)
-       (remove #(contains? (:knowledge civ) %))
-       (filter #(has-prereqs? civ %))))
+  (->> all-techs
+       (remove #(contains? (:knowledge civ) (:name %)))
+       (filter #(every? (partial contains? (:knowledge civ)) (:prereqs %)))))
 
 (defn discover [civ tech stardate]
-  (let [info (tech-info tech)]
-    (-> civ
-        (update :knowledge conj tech)
-        (update :crisis-chance #(merge-with + % (:crisis-chance info)))
-        (update :events conj
-          {:stardate stardate
-           :title (str "discovered " tech)
-           :desc (->> (for [part (:desc info)]
-                        (if (vector? part) (get-in civ part) part))
-                      (str/join))}))))
+  (-> civ
+      (update :knowledge conj (:name tech))
+      (update :crisis-chance #(merge-with + % (:crisis-chance tech)))
+      (update :events conj {:desc (desc-for-tech civ tech stardate)})))
 
 ;;; civs
 
@@ -185,9 +169,10 @@
               {:desc (str "The " species-name " "
                           (rand-nth ["reside on" "inhabit"])
                           " the "
-                          (rand-nth ["abundant" "barren" "cold" "dry" "dusty" "humid" "lush"
-                                     "misty" "overgrown" "rainy" "rocky" "sparse" "stormy"
-                                     "torrid" "verdant" "warm" "wet" "windy"])
+                          (rand-nth ["abundant" "arid" "barren" "chilly" "cold" "dry" "dusty"
+                                     "frigid" "humid" "lush" "misty" "overgrown" "rainy" "rocky"
+                                     "sparse" "steamy" "stormy" "temperate" "torrid" "verdant"
+                                     "warm" "wet" "windy"])
                           " planet " planet
                           " in the " system " system. "
                           "They speak a language which is known as " language-name ".")}]

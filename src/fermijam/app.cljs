@@ -67,15 +67,15 @@
       (when (and (not (:extinct? data)) (seq (possible-techs data)))
         (dom/div {:class "enlighten"}
           (dom/p "We could teach them the secrets of ")
-          (for [part (interpose ", or of " (map #(-> [%]) (possible-techs data)))]
-            (if (vector? part)
-              (let [tech (first part)]
+          (for [part (interpose ", or of " (possible-techs data))]
+            (if (map? part)
+              (let [tech part]
                 (dom/a {:href "#"
                         :on-click (fn [e]
                                     (.preventDefault e)
                                     (om/transact! data []
                                       #(discover % tech (:stardate @app-state))))}
-                  tech))
+                  (name (:name tech))))
               (dom/span part))))))))
 
 (defcomponent app [data owner]
