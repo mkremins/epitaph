@@ -1,6 +1,6 @@
 (ns fermijam.app
   (:require [clojure.string :as str]
-            [fermijam.civs :refer [discover gen-civ possible-techs]]
+            [fermijam.civs :refer [discover extinct gen-civ possible-techs]]
             [om.core :as om]
             [om-tools.core :refer-macros [defcomponent]]
             [om-tools.dom :as dom]))
@@ -17,44 +17,23 @@
   (atom {:civs (vec (repeatedly 3 #(gen-civ 2500)))
          :stardate 2500}))
 
-(defn gen-extinction-event [civ stardate]
-  {:stardate stardate
-   :title "went extinct"
-   :extinction? true
-   :desc (rand-nth
-           [(str "In " stardate ", " (get-in civ [:vocab :planet])
-                 " collided with a "
-                 (rand-nth ["wandering" "wayward"])
-                 " "
-                 (rand-nth ["asteroid" "comet" "planetoid"])
-                 ", resulting in a mass extinction event"
-                 " which obliterated all traces of " (:name civ) " civilization.")
-            (str "In " stardate ", a massive volcanic eruption on "
-                 (get-in civ [:vocab :planet])
-                 " covered the sky with ash and blotted out the sun. "
-                 "The ensuing nuclear winter threw the planet's delicate ecosystem "
-                 "wildly out of balance, bringing about the end of "
-                 (:name civ) " civilization.")])})
-
-(defn extinct [civ event]
-  (-> civ
-      (assoc :extinct? true)
-      (update :events conj event)))
+(defn maybe-select-crisis [civ]
+  (loop [crisis-chance (seq (:crisis-chance civ))]
+    (when-let [[crisis chance-in-1000] (first crisis-chance)]
+      (if (and (pos? chance-in-1000)
+               (< (rand-int 1000) chance-in-1000))
+        crisis
+        (recur (rest crisis-chance))))))
 
 (defn civ-tick [civ stardate]
-  (cond-> civ
-    :always
-      (update :instability #(max 0 (dec %)))
-    (:extinct? civ)
-      (update :cycles-since-extinction (fnil inc 0))
-    ;; 1/100 chance of a non-extinct civ advancing on its own each tick
-    (and (not (:extinct? civ))
-         (zero? (rand-int 100))
-         (seq (possible-techs civ)))
-      (discover (rand-nth (possible-techs civ)) stardate)
-    ;; 1/500 chance of a civ going extinct from random fate each tick
-    (and (not (:extinct? civ)) (zero? (rand-int 500)))
-      (extinct (gen-extinction-event civ stardate))))
+  (if (:extinct? civ)
+    (update civ :cycles-since-extinction (fnil inc 0))
+    (if-let [crisis (maybe-select-crisis civ)]
+      (extinct civ crisis stardate)
+      (let [techs (possible-techs civ)]
+        ;; 1/100 chance of a non-extinct civ advancing on its own each tick
+        (cond-> civ (and (seq techs) (zero? (rand-int 100)))
+                    (discover (rand-nth techs) stardate))))))
 
 (defn tick []
   (om/transact! (om/root-cursor app-state)
