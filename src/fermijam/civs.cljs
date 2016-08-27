@@ -25,49 +25,68 @@
    "vengeful"
    "warlike" "wise"])
 
-(def tech-info
+(def all-techs
   {"tool-making"
    {:name "tool-making"
-    :desc ["The " [:name] " have discovered how to make stone tools. "
-           "This greatly aids them in hunting the wild " [:vocab :beast] "."]
     :crisis-chance {:overhunting +2
                     :overfishing -1
                     :crop-failure -1}}
    "agriculture"
    {:name "agriculture"
-    :desc ["The " [:name] " have begun to cultivate crops. They are especially "
-           "fond of " [:vocab :crop] ", a kind of "
-           (rand-nth ["fast-growing" "slow-growing" "sweet" "sour" "hardy"
-                      "tasty" "fleshy" "bitter" "colorful" "chewy" "tough"])
-           " "
-           (rand-nth ["fruit" "stalk" "leaf" "cactus" "flower" "vine"])
-           " that grows well in the soil of their native land."]
     :crisis-chance {:overhunting -1
                     :overfishing -1
                     :crop-failure +2}}
    "fishing"
    {:name "fishing"
-    :desc ["The " [:name] " have learned how to catch water-dwelling creatures, "
-           "such as the " [:vocab :fish] ", for food."]
     :crisis-chance {:overhunting -1
                     :overfishing +2
                     :crop-failure -1}}
    "writing"
    {:name "writing"
-    :desc ["The " [:name] " have developed a simple system of writing, "
-           "which they now use for record-keeping."]
     :crisis-chance {:war-over-metal -1}}
    "fire"
    {:name "fire"
-    :desc ["The " [:name] " have learned the secrets of fire."]
     :prereqs #{"tool-making"}
-    :crisis-chance {:forest-fire +3}}})
+    :crisis-chance {:forest-fire +3
+                    :food-illness -3}}})
+
+(defmulti desc-for-tech identity)
+
+(defmethod desc-for-tech "tool-making" [_]
+  ["The " [:name] " use stone tools for many things, including as weapons "
+   "when hunting the wild " [:vocab :beast] "."])
+
+(defmethod desc-for-tech "agriculture" [_]
+  ["The " [:name] " have begun to cultivate crops. They are especially "
+   "fond of " [:vocab :crop] ", a kind of "
+   (rand-nth ["fast-growing" "slow-growing" "sweet" "sour" "hardy"
+              "tasty" "fleshy" "bitter" "colorful" "chewy" "tough"])
+   " "
+   (rand-nth ["fruit" "stalk" "leaf" "cactus" "flower" "vine"])
+   " that grows well in the soil of their native land."])
+
+(defmethod desc-for-tech "fishing" [_]
+  ["The " [:name] " have learned how to catch water-dwelling creatures, "
+   "such as the " [:vocab :fish] ", for food."])
+
+(defmethod desc-for-tech "writing" [_]
+  ["The " [:name] " have developed a simple system of writing, "
+   "which they use primarily for "
+   (rand-nth ["poetry" "record-keeping" "storytelling" "worship"])
+   "."])
+
+(defmethod desc-for-tech "fire" [_]
+  ["The " [:name] " have learned the secrets of fire. "
+   "They use it to cook their food, and to light their villages at night."])
+
+(defn tech-info [tech]
+  (assoc (all-techs tech) :desc (desc-for-tech tech)))
 
 (defn has-prereqs? [civ tech]
   (every? #(contains? (:knowledge civ) %) (:prereqs (tech-info tech))))
 
 (defn possible-techs [civ]
-  (->> (keys tech-info)
+  (->> (keys all-techs)
        (remove #(contains? (:knowledge civ) %))
        (filter #(has-prereqs? civ %))))
 
@@ -86,16 +105,29 @@
 
 (defn gen-civ [stardate]
   (let [language (gen-language)
-        species-name (str/capitalize (gen-word language))]
+        species-name (str/capitalize (gen-word language))
+        [trait1 trait2 trait3] (pick-n 3 all-traits)
+        system (str/capitalize (gen-word language))
+        planet (str/capitalize (gen-word language))
+        language-name (str/capitalize (gen-word language))]
     {:name species-name
-     :system (str/capitalize (gen-word language))
+     :system system
      :language language
-     :traits (pick-n 3 all-traits)
      :knowledge #{}
      :instability 0
-     :events [{:stardate stardate
-               :title "first appeared"
-               :desc (str "The " species-name " came to our attention.")}]
+     :events [{:desc (str "We first became aware of the " species-name " in " stardate ". "
+                          "They are " trait1 ", " trait2 ", and " trait3 ". ")}
+              {:desc (str "The " species-name " "
+                          (rand-nth ["reside on" "inhabit"])
+                          " the "
+                          (rand-nth ["abundant" "barren" "cold" "dry" "dusty" "humid" "lush"
+                                     "misty" "overgrown" "rainy" "rocky" "sparse" "stormy"
+                                     "torrid" "verdant" "warm" "wet" "windy"])
+                          " planet " planet
+                          " in the " system " system. "
+                          "They speak a language which is known as " language-name ".")}]
      :vocab {:beast (gen-word language)
              :crop (gen-word language)
-             :fish (gen-word language)}}))
+             :fish (gen-word language)
+             :planet planet
+             :language language-name}}))

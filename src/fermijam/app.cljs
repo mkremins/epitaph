@@ -22,9 +22,19 @@
    :title "went extinct"
    :extinction? true
    :desc (rand-nth
-           [(str "The home planet of the " (:name civ)
-                 " collided with a wandering asteroid, resulting in a mass extinction event"
-                 " which obliterated all traces of " (:name civ) " civilization.")])})
+           [(str "In " stardate ", " (get-in civ [:vocab :planet])
+                 " collided with a "
+                 (rand-nth ["wandering" "wayward"])
+                 " "
+                 (rand-nth ["asteroid" "comet" "planetoid"])
+                 ", resulting in a mass extinction event"
+                 " which obliterated all traces of " (:name civ) " civilization.")
+            (str "In " stardate ", a massive volcanic eruption on "
+                 (get-in civ [:vocab :planet])
+                 " covered the sky with ash and blotted out the sun. "
+                 "The ensuing nuclear winter threw the planet's delicate ecosystem "
+                 "wildly out of balance, bringing about the end of "
+                 (:name civ) " civilization.")])})
 
 (defn extinct [civ event]
   (-> civ
@@ -58,12 +68,7 @@
 
 (defcomponent event-view [data owner]
   (render [_]
-    (dom/div {:class (cond-> "event" (:extinction? data) (str " extinction"))}
-      (dom/p {:class "title"
-              :on-click #(om/transact! data :expanded? not)}
-        (str (if (:expanded? data) "-" "+") " " (:stardate data) ": " (:title data)))
-      (when (:expanded? data)
-        (dom/p {:class "desc"} (:desc data))))))
+    (dom/p {:class "event"} (:desc data))))
 
 (defcomponent civ-view [data owner]
   (render [_]
@@ -75,21 +80,24 @@
                                      (str)))}}
       (dom/div {:class "profile"}
         (dom/h3 {:class "name"} (:name data))
-        (dom/p {:class "system"} (str (:system data) " system"))
-        (dom/p {:class "traits"}
-          (str/join ", " (:traits data))))
-      (dom/div {:class "enlighten"}
-        (dom/p "We shall teach them the secrets of...")
-        (for [tech (possible-techs data)]
-          (dom/a {:href "#"
-                  :on-click (fn [e]
-                              (.preventDefault e)
-                              (om/transact! data []
-                                #(discover % tech (:stardate @app-state))))}
-            (str tech "."))))
+        (dom/p {:class "system"} (str (:system data) " system")))
+      ;; events
       (dom/div {:class "events"}
-        (dom/h4 "History")
-        (om/build-all event-view (:events data))))))
+        (om/build-all event-view (:events data)))
+      ;; enlighten
+      (when (and (not (:extinct? data)) (seq (possible-techs data)))
+        (dom/div {:class "enlighten"}
+          (dom/p "We could teach them the secrets of ")
+          (for [part (interpose ", or of " (map #(-> [%]) (possible-techs data)))]
+            (if (vector? part)
+              (let [tech (first part)]
+                (dom/a {:href "#"
+                        :on-click (fn [e]
+                                    (.preventDefault e)
+                                    (om/transact! data []
+                                      #(discover % tech (:stardate @app-state))))}
+                  tech))
+              (dom/span part))))))))
 
 (defcomponent app [data owner]
   (render [_]

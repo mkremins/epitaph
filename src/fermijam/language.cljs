@@ -60,7 +60,8 @@
                       :b (rand-nth separators))))
              (clojure.string/join))
         (clojure.string/replace #"(.)\1" #(str (first (%1 1)))) ; eliminate doubles
-        (clojure.string/replace #"A|E|I|O|U" (:vowel-orthography language)))))
+        (clojure.string/replace #"A|E|I|O|U" (:vowel-orthography language))
+        (clojure.string/replace #"-" "‑")))) ; non-breaking hyphens
 
 (defn gen-word [language]
   (loop [word (gen-word* language)]

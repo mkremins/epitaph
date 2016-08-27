@@ -11,6 +11,9 @@
     margin: 0;
     padding: 0;
   }
+  a {
+    text-decoration: none;
+  }
   html {
     background: #222;
     color: #eee;
@@ -38,18 +41,14 @@
     margin-bottom: 1rem;
   }
   .enlighten a {
-    color: inherit;
-    display: block;
-  }
-  .event .title {
-    cursor: pointer;
-    text-decoration: underline;
-  }
-  .event.extinction .title {
     color: red;
   }
-  .event .desc {
-    margin-bottom: 0.5rem;
+  .enlighten a:last-child:after {
+    color: #eee;
+    content: ".";
+  }
+  .event {
+    margin-bottom: 1rem;
   }
   .system {
     font-style: italic;
