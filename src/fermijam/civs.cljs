@@ -70,19 +70,19 @@
 
 (def all-techs
   [{:name :tool-making
-    :crisis-chance {:overhunting +10
-                    :overfishing -5
-                    :crop-failure -5}}
+    :crisis-chance {:overhunting +4
+                    :overfishing -3
+                    :crop-failure -3}}
    {:name :agriculture
-    :crisis-chance {:overhunting -5
-                    :overfishing -5
-                    :crop-failure +10}}
+    :crisis-chance {:overhunting -3
+                    :overfishing -3
+                    :crop-failure +4}}
    {:name :fishing
-    :crisis-chance {:overhunting -5
-                    :overfishing +10
-                    :crop-failure -5}}
+    :crisis-chance {:overhunting -3
+                    :overfishing +4
+                    :crop-failure -3}}
    {:name :writing
-    :crisis-chance {:war-over-metal -5}}
+    :crisis-chance {:war-over-metal -3}}
    {:name :fire
     :prereqs #{:tool-making}
     :crisis-chance {:forest-fire +2

@@ -14,8 +14,13 @@
     (+ (/ (* (- x old-min) new-range) old-range) new-min)))
 
 (defonce app-state
-  (atom {:civs (vec (repeatedly 3 #(gen-civ 2500)))
-         :stardate 2500}))
+  (let [stardate (+ 2200 (rand-int 700))]
+    (atom {:civs [(gen-civ stardate)]
+           :stardate stardate
+           :last-intervened 0})))
+
+(defn can-intervene? [state]
+  (< (+ (:last-intervened state) 10) (:stardate state)))
 
 (defn maybe-select-crisis [civ]
   (loop [crisis-chance (seq (:crisis-chance civ))]
@@ -44,8 +49,7 @@
             new-civ-chance (if (every? :extinct? civs) 20 4)
             civs (cond-> civs (< (rand-int 1000) new-civ-chance)
                               (conj (gen-civ new-stardate)))]
-        {:civs civs
-         :stardate new-stardate}))))
+        (assoc state :civs civs :stardate new-stardate)))))
 
 (defcomponent event-view [data owner]
   (render [_]
@@ -76,14 +80,22 @@
                         :on-click (fn [e]
                                     (.preventDefault e)
                                     (om/transact! data []
-                                      #(discover % tech (:stardate @app-state))))}
+                                      #(discover % tech (:stardate @app-state)))
+                                    (om/transact! (om/root-cursor app-state) []
+                                      #(assoc % :last-intervened (:stardate %))))}
                   (name (:name tech))))
               (dom/span part))))))))
 
 (defcomponent app [data owner]
   (render [_]
-    (dom/div {:class "app"}
-      (dom/p {:class "stardate"} (str "Stardate " (:stardate data)))
+    (dom/div {:class (cond-> "app" (not (can-intervene? data))
+                                   (str " cannot-intervene"))}
+      (dom/p {:class "stardate"}
+        (dom/span (str "Stardate " (:stardate data)))
+        (when (pos? (:last-intervened data))
+          (dom/span {}
+            " | Last intervened in "
+            (dom/span {:class "last-intervened"} (:last-intervened data)))))
       (dom/div {:class "civs"}
         (om/build-all civ-view (:civs data))))))
 
