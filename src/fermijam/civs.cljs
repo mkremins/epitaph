@@ -205,22 +205,17 @@
      :language language
      :knowledge #{}
      :events [{:desc (str "We first became aware of the " species-name " in " stardate ". "
-                          "They are " trait1 ", " trait2 ", and " trait3 ". ")}
-              {:desc (str "The " species-name " "
-                          (rand-nth ["reside on" "inhabit"])
-                          " the "
+                          "They " (rand-nth ["inhabit" "reside on"]) " the "
                           (rand-nth ["abundant" "arid" "barren" "chilly" "cold" "dry" "dusty"
                                      "frigid" "humid" "lush" "misty" "overgrown" "rainy" "rocky"
                                      "sparse" "steamy" "stormy" "temperate" "torrid" "verdant"
                                      "warm" "wet" "windy"])
-                          " planet " planet
-                          " in the " system " system. "
-                          "They speak a language which is known as " language-name ".")}]
+                          " planet " planet " in the " system " system. "
+                          "They are " trait1 ", " trait2 ", and " trait3 ". ")}]
      :vocab {:beast (gen-word language)
              :crop (gen-word language)
              :fish (gen-word language)
-             :planet planet
-             :language language-name}
+             :planet planet}
      :crisis-chance {:asteroid +1
                      :volcano +1
                      :food-illness +3}}))
