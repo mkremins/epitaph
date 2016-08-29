@@ -34,6 +34,7 @@
     display: none;
   }
   .civ {
+    animation: new-event 5s linear;
     display: inline-block;
     margin-bottom: 3rem;
     margin-right: 3rem;
@@ -57,7 +58,11 @@
     content: ".";
   }
   .event {
+    animation: new-event 5s linear;
     margin-bottom: 1rem;
+  }
+  @keyframes new-event {
+    from { color: yellow; } to { color: #eee; }
   }
   .system {
     font-style: italic;
