@@ -7,58 +7,55 @@
 
 (defmulti desc-for-crisis #(-> %2))
 
-(defmethod desc-for-crisis :asteroid [civ _ stardate]
-  (str "In " stardate ", " (get-in civ [:vocab :planet])
-       " collided with a " (rand-nth ["wandering" "wayward"]) " "
+(defmethod desc-for-crisis :asteroid [{:keys [vocab] :as civ} _ stardate]
+  (str "In " stardate ", " (vocab :planet) " collided with a "
+       (rand-nth ["wandering" "wayward"]) " "
        (rand-nth ["asteroid" "comet" "planetoid"]) ", resulting in "
        "a mass extinction event which obliterated all traces of "
        (:name civ) " civilization."))
 
-(defmethod desc-for-crisis :volcano [civ _ stardate]
-  (str "In " stardate ", a massive volcanic eruption on "
-       (get-in civ [:vocab :planet])
-       " covered the sky with ash and blotted out the sun. "
+(defmethod desc-for-crisis :volcano [{:keys [vocab] :as civ} _ stardate]
+  (str "In " stardate ", a massive volcanic eruption filled the skies of "
+       (vocab :planet) " with ash and blotted out the sun. "
        "The ensuing nuclear winter threw the planet's delicate ecosystem "
        "wildly out of balance, bringing about the end of "
        (:name civ) " civilization."))
 
-(defmethod desc-for-crisis :food-illness [civ _ stardate]
-  (str "In " stardate ", a plague infected the primary food source of the "
-       (:name civ) ". Its unusually deadly nature, coupled with its rapid spread "
-       "through the " (:name civ) " population, left less than 10% of the "
-       (:name civ) " alive, causing a population bottleneck which eventually "
+(defmethod desc-for-crisis :food-illness [{:keys [vocab] :as civ} _ stardate]
+  (str "In " stardate ", a food-borne illness began to spread rapidly through "
+       "the " (:name civ) " population. Less than 10% of the " (:name civ) " "
+       "survived the plague, causing a population bottleneck which eventually "
        "brought about the total collapse of " (:name civ) " civilization."))
 
-(defmethod desc-for-crisis :overhunting [civ _ stardate]
+(defmethod desc-for-crisis :overhunting [{:keys [vocab] :as civ} _ stardate]
   (str "Due to the extreme effectiveness of stone tools in hunting "
-       (get-in civ [:vocab :beast]) ", the " (:name civ) " managed to "
-       "hunt the " (get-in civ [:vocab :beast]) " species to extinction. "
-       "Being reliant on the " (get-in civ [:vocab :beast]) " for food, the "
-       (:name civ) " then suffered a famine which brought about the end of "
+       (vocab :beast) ", the " (:name civ) " managed to hunt the "
+       (vocab :beast) " species to extinction. "
+       "Being reliant on the " (vocab :beast) " for food, the " (:name civ)
+       " then suffered a famine which brought about the end of "
        (:name civ) " civilization."))
 
-(defmethod desc-for-crisis :overfishing [civ _ stardate]
+(defmethod desc-for-crisis :overfishing [{:keys [vocab] :as civ} _ stardate]
   (str "As the " (:name civ) " population increased, they began to overfish "
-       "the waters of " (get-in civ [:vocab :planet]) ". By " stardate
-       ", they had driven the " (get-in civ [:vocab :fish]) " species to extinction. "
+       "the waters of " (vocab :planet) ". By " stardate
+       ", they had driven the " (vocab :fish) " species to extinction. "
        "The ensuing famine brought about a total collapse of "
        (:name civ) " civilization."))
 
-(defmethod desc-for-crisis :crop-failure [civ _ stardate]
+(defmethod desc-for-crisis :crop-failure [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", a combination of " (rand-nth ["inclement" "poor"])
        " weather and pestilence caused a near-total failure of the "
-       (get-in civ [:vocab :crop]) " crop. Being overreliant on "
-       (get-in civ [:vocab :crop]) " cultivation for food, the " (:name civ)
+       (vocab :crop) " crop. Being overreliant on "  (vocab :crop)
+       " cultivation for food, the " (:name civ)
        " then suffered a massive famine which brought about the end of "
        (:name civ) " civilization."))
 
-(defmethod desc-for-crisis :forest-fire [civ _ stardate]
+(defmethod desc-for-crisis :forest-fire [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", a cooking fire started by one of the " (:name civ)
        " jumped to the forest, where it quickly blazed out of control. "
        "When the fire finally burned itself out, the forest had been almost "
-       "completely destroyed, and the ecosystem of " (get-in civ [:vocab :planet])
-       " went into a state of free-fall. This caused a total collapse of "
-       (:name civ) " civilization."))
+       "completely destroyed, disrupting the ecosystem of " (vocab :planet)
+       " enough to cause a total collapse of " (:name civ) " civilization."))
 
 (defn extinct [civ crisis stardate]
   (-> civ
@@ -90,32 +87,31 @@
 
 (defmulti desc-for-tech (fn [_ tech _] (:name tech)))
 
-(defmethod desc-for-tech :tool-making [civ _ stardate]
+(defmethod desc-for-tech :tool-making [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " use stone tools for many things, "
-       "including as weapons when hunting the wild "
-       (get-in civ [:vocab :beast]) "."))
+       "including as weapons when hunting the wild " (vocab :beast) "."))
 
-(defmethod desc-for-tech :agriculture [civ _ stardate]
+(defmethod desc-for-tech :agriculture [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have begun to cultivate crops. "
-       "They are especially fond of " (get-in civ [:vocab :crop])
-       ", a kind of "
-       (rand-nth ["fast-growing" "slow-growing" "sweet" "sour" "hardy"
-                  "tasty" "fleshy" "bitter" "colorful" "chewy" "tough"])
+       "They are especially fond of " (vocab :crop) ", a kind of "
+       (rand-nth ["bitter" "chewy" "colorful" "fleshy" "hardy" "sour" "sweet"
+                  "tasty" "tough"])
        " "
-       (rand-nth ["fruit" "stalk" "leaf" "cactus" "flower" "vine"])
-       " that grows well in the soil of " (get-in civ [:vocab :planet]) "."))
+       (rand-nth ["cactus" "flower" "fruit" "fungus" "grain" "leaf" "lichen"
+                  "moss" "mushroom" "nut" "root" "seedpod" "stalk" "vine"])
+       " that grows well in the dominant climate of " (vocab :planet) "."))
 
-(defmethod desc-for-tech :fishing [civ _ stardate]
+(defmethod desc-for-tech :fishing [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have learned how to catch water-dwelling creatures, "
-       "such as the " (get-in civ [:vocab :fish]) ", for food."))
+       "such as the " (vocab :fish) ", for food."))
 
-(defmethod desc-for-tech :writing [civ _ stardate]
+(defmethod desc-for-tech :writing [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have developed a simple system of writing, "
        "which they use primarily for "
        (rand-nth ["poetry" "record-keeping" "storytelling" "worship"]) "."))
 
-(defmethod desc-for-tech :fire [civ _ stardate]
-  (str "The " (:name civ) " have learned the secrets of fire. "
+(defmethod desc-for-tech :fire [{:keys [vocab] :as civ} _ stardate]
+  (str "The " (:name civ) " have mastered the control of fire. "
        "They use it to cook their food, and to light their villages at night."))
 
 (defn possible-techs [civ]
