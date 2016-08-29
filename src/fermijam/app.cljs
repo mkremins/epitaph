@@ -97,7 +97,7 @@
             " | Last intervened in "
             (dom/span {:class "last-intervened"} (:last-intervened data)))))
       (dom/div {:class "civs"}
-        (om/build-all civ-view (:civs data))))))
+        (om/build-all civ-view (reverse (:civs data)) {:key :name})))))
 
 (defn init []
   (enable-console-print!)
