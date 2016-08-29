@@ -102,8 +102,9 @@
        " that grows well in the dominant climate of " (vocab :planet) "."))
 
 (defmethod desc-for-tech :fishing [{:keys [vocab] :as civ} _ stardate]
-  (str "The " (:name civ) " have learned how to catch water-dwelling creatures, "
-       "such as the " (vocab :fish) ", for food."))
+  (str "The " (:name civ) " have learned how to catch water-dwelling creatures "
+       "such as the " (vocab :fish) ", which are now "
+       (rand-nth ["an important" "a staple"]) " part of the " (:name civ) " diet."))
 
 (defmethod desc-for-tech :writing [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have developed a simple system of writing, "
