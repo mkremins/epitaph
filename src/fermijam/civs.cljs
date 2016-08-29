@@ -17,7 +17,7 @@
 (defmethod desc-for-crisis :volcano [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", a massive volcanic eruption filled the skies of "
        (vocab :planet) " with ash and blotted out the sun. "
-       "The ensuing nuclear winter threw the planet's delicate ecosystem "
+       "The ensuing volcanic winter threw the planet's delicate ecosystem "
        "wildly out of balance, bringing about the end of "
        (:name civ) " civilization."))
 
@@ -57,6 +57,21 @@
        "completely destroyed, disrupting the ecosystem of " (vocab :planet)
        " enough to cause a total collapse of " (:name civ) " civilization."))
 
+(defmethod desc-for-crisis :war-over-metal [{:keys [vocab] :as civ} _ stardate]
+  (str "In " stardate ", due to the growing importance of metal-forged weapons "
+       "in warfare and the scarcity of metal deposits on " (vocab :planet) ", "
+       "a massive and bloody conflict erupted over control of these deposits. "
+       "Over 80% of the " (:name civ) " population was wiped out in the fighting, "
+       "a loss from which " (:name civ) " civilization was ultimately unable "
+       "to recover."))
+
+(defmethod desc-for-crisis :city-plague [{:keys [vocab] :as civ} _ stardate]
+  (str "In " stardate ", a virulent new plague spread swiftly through the "
+       "largest and densest centers of " (:name civ) " population. Living in "
+       "such close proximity, the city-dwelling " (:name civ) " were almost "
+       "entirely wiped out by the disease, a loss from which " (:name civ) " "
+       "civilization was ultimately unable to recover."))
+
 (defn extinct [civ crisis stardate]
   (-> civ
       (assoc :extinct? true)
@@ -66,7 +81,7 @@
 ;;; techs
 
 (def all-techs
-  [{:name :tool-making
+  [{:name :toolmaking
     :crisis-chance {:overhunting +4
                     :overfishing -3
                     :crop-failure -3}}
@@ -79,15 +94,26 @@
                     :overfishing +4
                     :crop-failure -3}}
    {:name :writing
-    :crisis-chance {:war-over-metal -3}}
+    :crisis-chance {:war-over-metal -2}}
+   {:name :astronomy}
    {:name :fire
-    :prereqs #{:tool-making}
+    :prereqs #{:toolmaking}
     :crisis-chance {:forest-fire +2
-                    :food-illness -3}}])
+                    :food-illness -3}}
+   {:name :metalworking
+    :prereqs #{:fire}
+    :crisis-chance {:war-over-metal +3}}
+   {:name :construction
+    :prereqs #{:toolmaking :agriculture}
+    :crisis-chance {:city-plague +1
+                    :war-over-metal -1
+                    :forest-fire -2}}
+   {:name :mathematics
+    :prereqs #{:writing :astronomy}}])
 
 (defmulti desc-for-tech (fn [_ tech _] (:name tech)))
 
-(defmethod desc-for-tech :tool-making [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-tech :toolmaking [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " use stone tools for many things, "
        "including as weapons when hunting the wild " (vocab :beast) "."))
 
@@ -111,9 +137,26 @@
        "which they use primarily for "
        (rand-nth ["poetry" "record-keeping" "storytelling" "worship"]) "."))
 
+(defmethod desc-for-tech :astronomy [{:keys [vocab] :as civ} _ stardate]
+  (str "The " (:name civ) " have begun to watch the skies and recognize patterns "
+       "in the movements of stars, which they use to navigate over great distances "
+       "and keep track of time."))
+
 (defmethod desc-for-tech :fire [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have mastered the control of fire. "
        "They use it to cook their food, and to light their villages at night."))
+
+(defmethod desc-for-tech :metalworking [{:keys [vocab] :as civ} _ stardate]
+  (str "The " (:name civ) " have discovered how to forge molten metal into "
+       "jewelry, tools, weapons, and armor."))
+
+(defmethod desc-for-tech :construction [{:keys [vocab] :as civ} _ stardate]
+  (str "The " (:name civ) " have begun to construct permanent dwellings and "
+       "other structures using materials such as wood and stone."))
+
+(defmethod desc-for-tech :mathematics [{:keys [vocab] :as civ} _ stardate]
+  (str "The " (:name civ) " have developed a sophisticated understanding of "
+       "basic mathematics, such as arithmetic, algebra, and geometry."))
 
 (defn possible-techs [civ]
   (->> all-techs

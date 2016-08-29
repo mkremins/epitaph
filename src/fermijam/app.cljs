@@ -64,27 +64,27 @@
                                      (max 0.03)
                                      (str)))}}
       (dom/div {:class "profile"}
-        (dom/h3 {:class "name"} (:name data))
-        (dom/p {:class "system"} (str (:system data) " system")))
+        (dom/h3 {:class "name"} (:name data)))
       ;; events
       (dom/div {:class "events"}
         (om/build-all event-view (:events data)))
       ;; enlighten
       (when (and (not (:extinct? data)) (seq (possible-techs data)))
         (dom/div {:class "enlighten"}
-          (dom/p "We could teach them the secrets of ")
-          (for [part (interpose ", or of " (possible-techs data))]
-            (if (map? part)
-              (let [tech part]
-                (dom/a {:href "#"
-                        :on-click (fn [e]
-                                    (.preventDefault e)
-                                    (om/transact! data []
-                                      #(discover % tech (:stardate @app-state)))
-                                    (om/transact! (om/root-cursor app-state) []
-                                      #(assoc % :last-intervened (:stardate %))))}
-                  (name (:name tech))))
-              (dom/span part))))))))
+          (dom/p {}
+            "We could teach them the secrets of "
+            (for [part (interpose ", or of " (possible-techs data))]
+              (if (map? part)
+                (let [tech part]
+                  (dom/a {:href "#"
+                          :on-click (fn [e]
+                                      (.preventDefault e)
+                                      (om/transact! data []
+                                        #(discover % tech (:stardate @app-state)))
+                                      (om/transact! (om/root-cursor app-state) []
+                                        #(assoc % :last-intervened (:stardate %))))}
+                    (name (:name tech))))
+                (dom/span part)))))))))
 
 (defcomponent app [data owner]
   (render [_]
