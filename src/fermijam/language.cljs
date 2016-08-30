@@ -83,14 +83,3 @@
    :sibilants         (pick-n (+ 1 (rand-int 2)) all-sibilants)
    :word-structures   (repeatedly (+ 3 (rand-int 3)) gen-word-structure)
    :vowel-orthography (rand-nth all-vowel-orthographies)})
-
-(defn test []
-  (let [language (gen-language)]
-    (doseq [word (repeatedly 10 #(gen-word language))]
-      (println word))))
-
-(defn test-names []
-  (let [language (gen-language)
-        pairs (repeatedly 10 #(-> [(gen-word language) (gen-word language)]))]
-    (doseq [[a b] pairs]
-      (println (str (clojure.string/capitalize a) " " (clojure.string/capitalize b))))))
