@@ -82,32 +82,32 @@
 
 (def all-techs
   [{:name :toolmaking
-    :crisis-chance {:overhunting +4
-                    :overfishing -3
-                    :crop-failure -3}}
+    :crisis-chance {:overhunting (/ +4 1000)
+                    :overfishing (/ -3 1000)
+                    :crop-failure (/ -3 1000)}}
    {:name :agriculture
-    :crisis-chance {:overhunting -3
-                    :overfishing -3
-                    :crop-failure +4}}
+    :crisis-chance {:overhunting (/ -3 1000)
+                    :overfishing (/ -3 1000)
+                    :crop-failure (/ +4 1000)}}
    {:name :fishing
-    :crisis-chance {:overhunting -3
-                    :overfishing +4
-                    :crop-failure -3}}
+    :crisis-chance {:overhunting (/ -3 1000)
+                    :overfishing (/ +4 1000)
+                    :crop-failure (/ -3 1000)}}
    {:name :writing
-    :crisis-chance {:war-over-metal -2}}
+    :crisis-chance {:war-over-metal (/ -2 1000)}}
    {:name :astronomy}
    {:name :fire
     :prereqs #{:toolmaking}
-    :crisis-chance {:forest-fire +2
-                    :food-illness -3}}
+    :crisis-chance {:forest-fire (/ +2 1000)
+                    :food-illness (/ -3 1000)}}
    {:name :metalworking
     :prereqs #{:fire}
-    :crisis-chance {:war-over-metal +3}}
+    :crisis-chance {:war-over-metal (/ +3 1000)}}
    {:name :construction
     :prereqs #{:toolmaking :agriculture}
-    :crisis-chance {:city-plague +1
-                    :war-over-metal -1
-                    :forest-fire -2}}
+    :crisis-chance {:city-plague (/ +1 1000)
+                    :war-over-metal (/ -1 1000)
+                    :forest-fire (/ -2 1000)}}
    {:name :mathematics
     :prereqs #{:writing :astronomy}}])
 
@@ -216,6 +216,6 @@
              :crop (gen-word language)
              :fish (gen-word language)
              :planet planet}
-     :crisis-chance {:asteroid +1
-                     :volcano +1
-                     :food-illness +3}}))
+     :crisis-chance {:asteroid (/ +1 1000)
+                     :volcano (/ +1 1000)
+                     :food-illness (/ +3 1000)}}))

@@ -24,9 +24,8 @@
 
 (defn maybe-select-crisis [civ]
   (loop [crisis-chance (seq (:crisis-chance civ))]
-    (when-let [[crisis chance-in-1000] (first crisis-chance)]
-      (if (and (pos? chance-in-1000)
-               (< (rand-int 1000) chance-in-1000))
+    (when-let [[crisis chance] (first crisis-chance)]
+      (if (and (pos? chance) (< (rand) chance))
         crisis
         (recur (rest crisis-chance))))))
 
@@ -36,8 +35,8 @@
     (if-let [crisis (maybe-select-crisis civ)]
       (extinct civ crisis stardate)
       (let [techs (possible-techs civ)]
-        ;; 1/100 chance of a non-extinct civ advancing on its own each tick
-        (cond-> civ (and (seq techs) (zero? (rand-int 100)))
+        ;; every non-extinct civ has a chance to advance on its own each tick
+        (cond-> civ (and (seq techs) (< (rand) (/ 1 100)))
                     (discover (rand-nth techs) stardate))))))
 
 (defn tick []
@@ -45,9 +44,9 @@
     (fn [state]
       (let [new-stardate (inc (:stardate state))
             civs (mapv #(civ-tick % new-stardate) (:civs state))
-            ;; 1/50 chance to spawn a new civ if all are extinct, 1/250 chance otherwise
-            new-civ-chance (if (every? :extinct? civs) 20 4)
-            civs (cond-> civs (< (rand-int 1000) new-civ-chance)
+            ;; new civs more likely to spawn if all existing civs are extinct
+            new-civ-chance (if (every? :extinct? civs) (/ 1 50) (/ 1 250))
+            civs (cond-> civs (< (rand) new-civ-chance)
                               (conj (gen-civ new-stardate)))]
         (assoc state :civs civs :stardate new-stardate)))))
 
