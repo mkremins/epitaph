@@ -21,6 +21,17 @@
        "wildly out of balance, bringing about the end of "
        (:name civ) " civilization."))
 
+(defmethod desc-for-crisis :gamma-ray-burst [{:keys [vocab] :as civ} _ stardate]
+  (str "In " stardate ", a gamma-ray burst – caused by the explosion of a star "
+       "roughly " (+ 900 (* 100 (rand-int 80))) " "
+       (rand-nth ["light-years" "parsecs"]) " from the " (vocab :system)
+       " system – showered " (vocab :planet) " in high energy electromagnetic "
+       "radiation. The planet's atmospheric ozone layer shielded planetary life "
+       "from immediate harm, but was dramatically depleted in the process. "
+       "Stripped of its protection against ordinary UV radiation, the planet's "
+       "ecosystem gradually collapsed, ushering in the end of " (:name civ)
+       " civilization."))
+
 (defmethod desc-for-crisis :food-illness [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", a food-borne illness began to spread rapidly through "
        "the " (:name civ) " population. Less than 10% of the " (:name civ) " "
@@ -106,7 +117,7 @@
    {:name :fire
     :prereqs #{:toolmaking}
     :crisis-chance {:forest-fire (/ +2 1000)
-                    :food-illness (/ -3 1000)}}
+                    :food-illness (/ -2.5 1000)}}
    {:name :metalworking
     :prereqs #{:fire}
     :crisis-chance {:war-over-metal (/ +3 1000)}}
@@ -118,7 +129,7 @@
    {:name :mathematics
     :prereqs #{:writing :astronomy}}
    {:name :sailing
-    :prereqs #{:astronomy :construction}
+    :prereqs #{:astronomy :construction :fishing}
     :crisis-chance {:sea-plague (/ +2 1000)}}
    {:name :plumbing
     :prereqs #{:construction :metalworking}
@@ -231,7 +242,6 @@
         system (gen-caps-word)
         planet (gen-caps-word)]
     {:name species-name
-     :system system
      :language language
      :knowledge #{}
      :events [{:desc (str "We first became aware of the " species-name " in " stardate ". "
@@ -245,10 +255,12 @@
      :vocab {:beast (gen-word language)
              :crop (gen-word language)
              :fish (gen-word language)
+             :system system
              :planet planet
              :city (if (zero? (rand-int 5))
                      (str (gen-caps-word) " " (gen-caps-word))
                      (gen-caps-word))}
      :crisis-chance {:asteroid (/ +1 1000)
                      :volcano (/ +1 1000)
-                     :food-illness (/ +3 1000)}}))
+                     :food-illness (/ +2.5 1000)
+                     :gamma-ray-burst (/ +1 3000)}}))
