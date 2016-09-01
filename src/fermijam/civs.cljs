@@ -131,6 +131,9 @@
    {:name :sailing
     :prereqs #{:astronomy :construction :fishing}
     :crisis-chance {:sea-plague (/ +2 1000)}}
+   {:name :architecture
+    :prereqs #{:construction :mathematics}
+    :crisis-chance {:city-fire (/ -1 1000)}}
    {:name :plumbing
     :prereqs #{:construction :metalworking}
     :crisis-chance {:city-plague (/ -2 1000)
@@ -189,6 +192,11 @@
   (str "The " (:name civ) " have learned how to build ships and sail them "
        "across the oceans of " (vocab :planet) " to explore and trade over "
        "increasingly greater distances."))
+
+(defmethod desc-for-tech :architecture [{:keys [vocab] :as civ} _ stardate]
+  (str "The " (:name civ) " have begun to make use of more sophisticated "
+       "construction techniques, relying on sturdy structural elements such "
+       "as arches and buttresses to support larger and larger buildings."))
 
 (defmethod desc-for-tech :plumbing [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have built elaborate pipe and sewer systems to "
