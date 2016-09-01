@@ -1,9 +1,10 @@
 (ns fermijam.language
-  (:require [clojure.string]
-            [fermijam.rand :refer [pick-n]]))
+  (:require [clojure.string :as str]
+            [fermijam.rand :refer [pick-n restricted]]))
 
 (def all-consonants
-  ["b" "c" "d" "g" "h" "k" "m" "n" "l" "p" "q" "s" "t" "v" "x" "y" "z"])
+  ["b" "b" "c" "c" "d" "d" "g" "g" "h" "h" "k" "k" "m" "m" "n" "n" "l" "p" "p"
+   "q" "s" "t" "t" "v" "v" "x" "y" "z"])
 
 (def all-vowels
   ["a" "e" "i" "o" "u"
@@ -13,10 +14,10 @@
    "A" "E" "I" "O" "U"])
 
 (def all-sibilants
-  ["f" "s"])
+  ["f" "s" ""])
 
 (def all-liquids
-  ["j" "l" "r" "w"])
+  ["j" "l" "r" "w" "" ""])
 
 (def all-separators
   ["" "" "" "" "" "" "" "" "-" "'"])
@@ -44,7 +45,9 @@
    [:cs :l :v :ce] [:cs :l :v :ce]
    [:cs :l :v] [:cs :l :v]
    [:cs :v :l :ce] [:cs :v :l :ce]
-   [:v] [:v] [:v] [:v]])
+   [:v] [:v] [:v] [:v]
+   [:s :cs :v :ce] [:s :cs :v :ce]
+   [:s :cs :v] [:s :cs :v]])
 
 (defn gen-word* [language]
   (let [{:keys [start-consonants end-consonants vowels
@@ -58,28 +61,25 @@
                       :s (rand-nth sibilants)
                       :v (rand-nth vowels)
                       :b (rand-nth separators))))
-             (clojure.string/join))
-        (clojure.string/replace #"(.)\1" #(str (first (%1 1)))) ; eliminate doubles
-        (clojure.string/replace #"A|E|I|O|U" (:vowel-orthography language))
-        (clojure.string/replace #"-" "‑")))) ; non-breaking hyphens
+             (str/join))
+        (str/replace #"(.)\1" #(str (first (%1 1)))) ; eliminate doubles
+        (str/replace #"A|E|I|O|U" (:vowel-orthography language))
+        (str/replace #"-" "‑")))) ; non-breaking hyphens
 
-(defn gen-word [language]
-  (loop [word (gen-word* language)]
-    (if (> (count word) 1)
-      word
-      (recur (gen-word* language)))))
+(def gen-word
+  (restricted #(> (count %) 1) gen-word*))
 
 (defn gen-word-structure []
-  (->> (pick-n (+ 1 (rand-int 3) (rand-int 2)) all-syllable-structures)
+  (->> (pick-n (rand-nth [2 2 2 2 2 2 3 4]) all-syllable-structures)
        (interpose [:b]) ; syllable boundaries
        (reduce into)))
 
 (defn gen-language []
-  {:start-consonants  (pick-n (+ 3 (rand-int 3)) all-consonants)
-   :end-consonants    (pick-n (+ 3 (rand-int 3)) all-consonants)
-   :vowels            (pick-n (+ 3 (rand-int 3)) all-vowels)
+  {:start-consonants  (pick-n (rand-nth [3 3 3 3 4]) all-consonants)
+   :end-consonants    (pick-n (rand-nth [3 3 3 3 4]) all-consonants)
+   :vowels            (pick-n (rand-nth [3 3 3 3 4]) all-vowels)
    :separators        (pick-n 5 all-separators)
-   :liquids           (pick-n (+ 1 (rand-int 3)) all-liquids)
-   :sibilants         (pick-n (+ 1 (rand-int 2)) all-sibilants)
-   :word-structures   (repeatedly (+ 3 (rand-int 3)) gen-word-structure)
+   :liquids           (pick-n (rand-nth [1 1 1 1 1 1 1 2 2 3]) all-liquids)
+   :sibilants         (pick-n (rand-nth [1 1 1 1 2]) all-sibilants)
+   :word-structures   (repeatedly 3 gen-word-structure)
    :vowel-orthography (rand-nth all-vowel-orthographies)})
