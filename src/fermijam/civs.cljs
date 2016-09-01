@@ -72,6 +72,13 @@
        "entirely wiped out by the disease, a loss from which " (:name civ) " "
        "civilization was ultimately unable to recover."))
 
+(defmethod desc-for-crisis :sea-plague [{:keys [vocab] :as civ} _ stardate]
+  (str "In " stardate ", a number of " (:name civ) " "
+       (rand-nth ["explorers" "traders"]) " returned from across the sea "
+       "bearing symptoms of an unfamiliar illness. Having no immunity to the "
+       "germs that caused the disease, the majority of the " (:name civ)
+       " population was wiped out by the ensuing plague."))
+
 (defn extinct [civ crisis stardate]
   (-> civ
       (assoc :extinct? true)
@@ -105,11 +112,20 @@
     :crisis-chance {:war-over-metal (/ +3 1000)}}
    {:name :construction
     :prereqs #{:toolmaking :agriculture}
-    :crisis-chance {:city-plague (/ +1 1000)
+    :crisis-chance {:city-plague (/ +2 1000)
                     :war-over-metal (/ -1 1000)
                     :forest-fire (/ -2 1000)}}
    {:name :mathematics
-    :prereqs #{:writing :astronomy}}])
+    :prereqs #{:writing :astronomy}}
+   {:name :sailing
+    :prereqs #{:astronomy :construction}
+    :crisis-chance {:sea-plague (/ +2 1000)}}
+   {:name :plumbing
+    :prereqs #{:construction :metalworking}
+    :crisis-chance {:city-plague (/ -2 1000)
+                    :sea-plague (/ -1 1000)}}
+   {:name :optics
+    :prereqs #{:mathematics :metalworking}}])
 
 (defmulti desc-for-tech (fn [_ tech _] (:name tech)))
 
@@ -158,6 +174,20 @@
   (str "The " (:name civ) " have developed a sophisticated understanding of "
        "basic mathematics, such as arithmetic, algebra, and geometry."))
 
+(defmethod desc-for-tech :sailing [{:keys [vocab] :as civ} _ stardate]
+  (str "The " (:name civ) " have learned how to build ships and sail them "
+       "across the oceans of " (vocab :planet) " to explore and trade over "
+       "increasingly greater distances."))
+
+(defmethod desc-for-tech :plumbing [{:keys [vocab] :as civ} _ stardate]
+  (str "The " (:name civ) " have built elaborate pipe and sewer systems to "
+       "supply their larger settlements, such as " (vocab :city) ", with "
+       "fresh water and a hygenic means of waste disposal."))
+
+(defmethod desc-for-tech :optics [{:keys [vocab] :as civ} _ stardate]
+  (str "The " (:name civ) " have begun to use lenses and mirrors made from "
+       "polished crystal, glass, and water to redirect and focus light."))
+
 (defn possible-techs [civ]
   (->> all-techs
        (remove #(contains? (:knowledge civ) (:name %)))
@@ -195,11 +225,11 @@
 
 (defn gen-civ [stardate]
   (let [language (gen-language)
-        species-name (str/capitalize (gen-word language))
+        gen-caps-word #(str/capitalize (gen-word language))
+        species-name (gen-caps-word)
         [trait1 trait2 trait3] (pick-n 3 all-traits)
-        system (str/capitalize (gen-word language))
-        planet (str/capitalize (gen-word language))
-        language-name (str/capitalize (gen-word language))]
+        system (gen-caps-word)
+        planet (gen-caps-word)]
     {:name species-name
      :system system
      :language language
@@ -215,7 +245,10 @@
      :vocab {:beast (gen-word language)
              :crop (gen-word language)
              :fish (gen-word language)
-             :planet planet}
+             :planet planet
+             :city (if (zero? (rand-int 5))
+                     (str (gen-caps-word) " " (gen-caps-word))
+                     (gen-caps-word))}
      :crisis-chance {:asteroid (/ +1 1000)
                      :volcano (/ +1 1000)
                      :food-illness (/ +3 1000)}}))
