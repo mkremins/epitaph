@@ -59,7 +59,8 @@
     (dom/div {:class (cond-> "civ" (:extinct? data) (str " extinct"))
               :style {:opacity (when (:extinct? data)
                                  (-> (:cycles-since-extinction data)
-                                     (scale [0 200] [0.75 0.03])
+                                     (scale [0 (+ 160 (* 20 (count (:events data))))]
+                                            [0.75 0.03])
                                      (max 0.03)
                                      (str)))}}
       (dom/div {:class "profile"}
