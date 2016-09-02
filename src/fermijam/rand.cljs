@@ -1,5 +1,12 @@
 (ns fermijam.rand)
 
+(defn biased-rand-nth
+  "Like `clojure.core/rand-nth`, but biased towards earlier items in `xs`."
+  [xs]
+  (let [r (rand)
+        r (* r r)] ; square to bias towards the low end
+    (nth xs (js/Math.floor (* r (count xs))))))
+
 (defn pick-n [n xs]
   (take n (shuffle xs)))
 
