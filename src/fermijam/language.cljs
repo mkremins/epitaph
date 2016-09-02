@@ -47,7 +47,9 @@
    [:cs :v :l :ce] [:cs :v :l :ce]
    [:v] [:v] [:v] [:v]
    [:s :cs :v :ce] [:s :cs :v :ce]
-   [:s :cs :v] [:s :cs :v]])
+   [:s :cs :v] [:s :cs :v]
+   [:s :l :v] [:s :l :v]
+   [:s :l :v :ce] [:s :l :v :ce]])
 
 (defn gen-word* [language]
   (let [{:keys [start-consonants end-consonants vowels
