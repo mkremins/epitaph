@@ -1,6 +1,6 @@
 (ns fermijam.app
   (:require [clojure.string :as str]
-            [fermijam.civs :refer [discover extinct gen-civ possible-techs]]
+            [fermijam.civs :refer [civ-tick discover gen-civ possible-techs]]
             [om.core :as om]
             [om-tools.core :refer-macros [defcomponent]]
             [om-tools.dom :as dom]))
@@ -21,23 +21,6 @@
 
 (defn can-intervene? [state]
   (< (+ (:last-intervened state) 10) (:stardate state)))
-
-(defn maybe-select-crisis [civ]
-  (loop [crisis-chance (seq (:crisis-chance civ))]
-    (when-let [[crisis chance] (first crisis-chance)]
-      (if (and (pos? chance) (< (rand) chance))
-        crisis
-        (recur (rest crisis-chance))))))
-
-(defn civ-tick [civ stardate]
-  (if (:extinct? civ)
-    (update civ :cycles-since-extinction (fnil inc 0))
-    (if-let [crisis (maybe-select-crisis civ)]
-      (extinct civ crisis stardate)
-      (let [techs (possible-techs civ)]
-        ;; every non-extinct civ has a chance to advance on its own each tick
-        (cond-> civ (and (seq techs) (< (rand) (/ 1 100)))
-                    (discover (rand-nth techs) stardate))))))
 
 (defn tick []
   (om/transact! (om/root-cursor app-state)

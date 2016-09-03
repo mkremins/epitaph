@@ -3,25 +3,29 @@
             [fermijam.language :refer [gen-language gen-word]]
             [fermijam.rand :refer [pick-n]]))
 
-;;; crises
+;;; events
 
-(defmulti desc-for-crisis #(-> %2))
+(def extinction-events
+  #{:asteroid :volcano :gamma-ray-burst :food-illness :overhunting :overfishing
+    :crop-failure :forest-fire :war-over-metal :city-plague :sea-plague})
 
-(defmethod desc-for-crisis :asteroid [{:keys [vocab] :as civ} _ stardate]
+(defmulti desc-for-event #(-> %2))
+
+(defmethod desc-for-event :asteroid [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", " (vocab :planet) " collided with a "
        (rand-nth ["wandering" "wayward"]) " "
        (rand-nth ["asteroid" "comet" "planetoid"]) ", resulting in "
        "a mass extinction event which obliterated all traces of "
        (:name civ) " civilization."))
 
-(defmethod desc-for-crisis :volcano [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :volcano [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", a massive volcanic eruption filled the skies of "
        (vocab :planet) " with ash and blotted out the sun. "
        "The ensuing volcanic winter threw the planet's delicate ecosystem "
        "wildly out of balance, bringing about the end of "
        (:name civ) " civilization."))
 
-(defmethod desc-for-crisis :gamma-ray-burst [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :gamma-ray-burst [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", a gamma-ray burst – caused by the explosion of a star "
        "roughly " (+ 900 (* 100 (rand-int 80))) " "
        (rand-nth ["light-years" "parsecs"]) " from the " (vocab :system)
@@ -32,13 +36,13 @@
        "ecosystem gradually collapsed, ushering in the end of " (:name civ)
        " civilization."))
 
-(defmethod desc-for-crisis :food-illness [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :food-illness [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", a food-borne illness began to spread rapidly through "
        "the " (:name civ) " population. Less than 10% of the " (:name civ) " "
        "survived the plague, causing a population bottleneck which eventually "
        "brought about the total collapse of " (:name civ) " civilization."))
 
-(defmethod desc-for-crisis :overhunting [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :overhunting [{:keys [vocab] :as civ} _ stardate]
   (str "Due to the extreme effectiveness of stone tools in hunting "
        (vocab :beast) ", the " (:name civ) " managed to hunt the "
        (vocab :beast) " species to extinction. "
@@ -46,14 +50,14 @@
        " then suffered a famine which brought about the end of "
        (:name civ) " civilization."))
 
-(defmethod desc-for-crisis :overfishing [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :overfishing [{:keys [vocab] :as civ} _ stardate]
   (str "As the " (:name civ) " population increased, they began to overfish "
        "the waters of " (vocab :planet) ". By " stardate
        ", they had driven the " (vocab :fish) " species to extinction. "
        "The ensuing famine brought about a total collapse of "
        (:name civ) " civilization."))
 
-(defmethod desc-for-crisis :crop-failure [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :crop-failure [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", a combination of " (rand-nth ["inclement" "poor"])
        " weather and pestilence caused a near-total failure of the "
        (vocab :crop) " crop. Being overreliant on "  (vocab :crop)
@@ -61,14 +65,14 @@
        " then suffered a massive famine which brought about the end of "
        (:name civ) " civilization."))
 
-(defmethod desc-for-crisis :forest-fire [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :forest-fire [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", a cooking fire started by one of the " (:name civ)
        " jumped to the forest, where it quickly blazed out of control. "
        "When the fire finally burned itself out, the forest had been almost "
        "completely destroyed, disrupting the ecosystem of " (vocab :planet)
        " enough to cause a total collapse of " (:name civ) " civilization."))
 
-(defmethod desc-for-crisis :war-over-metal [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :war-over-metal [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", due to the growing importance of metal-forged weapons "
        "in warfare and the scarcity of metal deposits on " (vocab :planet) ", "
        "a massive and bloody conflict erupted over control of these deposits. "
@@ -76,67 +80,66 @@
        "a loss from which " (:name civ) " civilization was ultimately unable "
        "to recover."))
 
-(defmethod desc-for-crisis :city-plague [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :city-plague [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", a virulent new plague spread swiftly through the "
        "largest and densest centers of " (:name civ) " population. Living in "
        "such close proximity, the city-dwelling " (:name civ) " were almost "
        "entirely wiped out by the disease, a loss from which " (:name civ) " "
        "civilization was ultimately unable to recover."))
 
-(defmethod desc-for-crisis :sea-plague [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :sea-plague [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", a number of " (:name civ) " "
        (rand-nth ["explorers" "traders"]) " returned from across the sea "
        "bearing symptoms of an unfamiliar illness. Having no immunity to the "
        "germs that caused the disease, the majority of the " (:name civ)
        " population was wiped out by the ensuing plague."))
 
-(defn extinct [civ crisis stardate]
+(defn perform-event [civ event stardate]
   (-> civ
-      (assoc :extinct? true)
-      (update :events conj
-        {:desc (desc-for-crisis civ crisis stardate) :extinction? true})))
+      (update :events conj {:desc (desc-for-event civ event stardate)})
+      (cond-> (contains? extinction-events event) (assoc :extinct? true))))
 
 ;;; techs
 
 (def all-techs
   [{:name :toolmaking
-    :crisis-chance {:overhunting (/ +4 1000)
+    :event-chances {:overhunting (/ +4 1000)
                     :overfishing (/ -3 1000)
                     :crop-failure (/ -3 1000)}}
    {:name :agriculture
-    :crisis-chance {:overhunting (/ -3 1000)
+    :event-chances {:overhunting (/ -3 1000)
                     :overfishing (/ -3 1000)
                     :crop-failure (/ +4 1000)}}
    {:name :fishing
-    :crisis-chance {:overhunting (/ -3 1000)
+    :event-chances {:overhunting (/ -3 1000)
                     :overfishing (/ +4 1000)
                     :crop-failure (/ -3 1000)}}
    {:name :writing
-    :crisis-chance {:war-over-metal (/ -2 1000)}}
+    :event-chances {:war-over-metal (/ -2 1000)}}
    {:name :astronomy}
    {:name :fire
     :prereqs #{:toolmaking}
-    :crisis-chance {:forest-fire (/ +2 1000)
+    :event-chances {:forest-fire (/ +2 1000)
                     :food-illness (/ -2.5 1000)}}
    {:name :metalworking
     :prereqs #{:fire}
-    :crisis-chance {:war-over-metal (/ +3 1000)}}
+    :event-chances {:war-over-metal (/ +3 1000)}}
    {:name :construction
     :prereqs #{:toolmaking :agriculture}
-    :crisis-chance {:city-plague (/ +2 1000)
+    :event-chances {:city-plague (/ +2 1000)
                     :war-over-metal (/ -1 1000)
                     :forest-fire (/ -2 1000)}}
    {:name :mathematics
     :prereqs #{:writing :astronomy}}
    {:name :sailing
     :prereqs #{:astronomy :construction :fishing}
-    :crisis-chance {:sea-plague (/ +2 1000)}}
+    :event-chances {:sea-plague (/ +2 1000)}}
    {:name :architecture
     :prereqs #{:construction :mathematics}
-    :crisis-chance {:city-fire (/ -1 1000)}}
+    :event-chances {:city-fire (/ -1 1000)}}
    {:name :plumbing
     :prereqs #{:construction :metalworking}
-    :crisis-chance {:city-plague (/ -2 1000)
+    :event-chances {:city-plague (/ -2 1000)
                     :sea-plague (/ -1 1000)}}
    {:name :optics
     :prereqs #{:mathematics :metalworking}}])
@@ -215,10 +218,10 @@
 (defn discover [civ tech stardate]
   (-> civ
       (update :knowledge conj (:name tech))
-      (update :crisis-chance #(merge-with + % (:crisis-chance tech)))
+      (update :event-chances #(merge-with + % (:event-chances tech)))
       (update :events conj {:desc (desc-for-tech civ tech stardate)})))
 
-;;; civs
+;;; generate civs
 
 (def all-traits
   ["adaptable" "adventurous" "aloof" "analytical" "arrogant" "artistic" "avaricious" "anxious"
@@ -268,7 +271,26 @@
              :city (if (zero? (rand-int 5))
                      (str (gen-caps-word) " " (gen-caps-word))
                      (gen-caps-word))}
-     :crisis-chance {:asteroid (/ +1 1000)
+     :event-chances {:asteroid (/ +1 1000)
                      :volcano (/ +1 1000)
                      :food-illness (/ +2.5 1000)
                      :gamma-ray-burst (/ +1 3000)}}))
+
+;;; update civs each tick
+
+(defn maybe-select-event [civ]
+  (loop [event-chances (shuffle (:event-chances civ))]
+    (when-let [[event chance] (first event-chances)]
+      (if (< (rand) chance)
+        event
+        (recur (rest event-chances))))))
+
+(defn civ-tick [civ stardate]
+  (if (:extinct? civ)
+    (update civ :cycles-since-extinction (fnil inc 0))
+    (if-let [event (maybe-select-event civ)]
+      (perform-event civ event stardate)
+      (let [techs (possible-techs civ)]
+        ;; every non-extinct civ has a chance to advance on its own each tick
+        (cond-> civ (and (seq techs) (< (rand) (/ 1 100)))
+                    (discover (rand-nth techs) stardate))))))
