@@ -23,7 +23,8 @@
    ;; flavor events
    :pets {:event-chances {:pets -1}}
    :large-city {:event-chances {:large-city -1}}
-   :conqueror {:event-chances {:conqueror -1}}})
+   :conqueror {:event-chances {:conqueror -1}}
+   :religion {:event-chances {:religion -1}}})
 
 (defmulti desc-for-event #(-> %2))
 
@@ -147,6 +148,30 @@
           "an elected tyrant"])
        "."))
 
+(defmethod desc-for-event :religion [{:keys [vocab] :as civ} _ stardate]
+  (str "In " stardate ", " (rand-nth ["a rapidly growing" "an emerging"]) " "
+       "religion known as " (vocab :religion) " "
+       (rand-nth ["became" "was declared"]) " the official religion of the "
+       "largest " (:name civ) " state. Adherents of " (vocab :religion) " "
+       "wear "
+       (rand-nth [(str (rand-nth ["distinctive" "striking"]) " "
+                       (rand-nth ["beaded" "black" "blue" "brown" "dark"
+                                  "embroidered" "gray" "green" "patterned"
+                                  "purple" "scarlet" "red" "white"]))
+                  (str (rand-nth ["plain" "simple"]) " "
+                       (rand-nth ["black" "blue" "brown" "dark" "gray" "green"
+                                  "purple" "scarlet" "red" "white"]))
+                  (rand-nth ["brightly colored"
+                             (str (rand-nth ["dazzlingly" "distinctive"]) " "
+                                  "colorful")
+                             (str (rand-nth ["distinctive " ""]) "concealing")
+                             "elaborately decorated"
+                             "intricately patterned"])])
+       " "
+       (rand-nth ["caps" "cloaks" "clothes" "clothing" "coats" "fabrics" "hats"
+                  "hoods" "masks" "robes" "shawls"])
+       " to mark themselves as believers."))
+
 (defn perform-event [civ event stardate]
   (let [info (event-info event)]
     (-> civ
@@ -161,6 +186,7 @@
     :event-chances {:overhunting (/ +4 1000)
                     :overfishing (/ -3 1000)
                     :crop-failure (/ -3 1000)
+                    :food-illness (/ +1 1000)
                     :pets (/ +3 1000)
                     :conqueror (/ +1 1000)}}
    {:name :agriculture
@@ -171,15 +197,18 @@
    {:name :fishing
     :event-chances {:overhunting (/ -3 1000)
                     :overfishing (/ +4 1000)
-                    :crop-failure (/ -3 1000)}}
+                    :crop-failure (/ -3 1000)
+                    :food-illness (/ +1 1000)}}
    {:name :writing
     :event-chances {:war-over-metal (/ -2 1000)
-                    :conqueror (/ +3 1000)}}
-   {:name :astronomy}
+                    :conqueror (/ +3 1000)
+                    :religion (/ +1 1000)}}
+   {:name :astronomy
+    :event-chances {:religion (/ +1 1000)}}
    {:name :fire
     :prereqs #{:toolmaking}
     :event-chances {:forest-fire (/ +2 1000)
-                    :food-illness (/ -2.5 1000)}}
+                    :food-illness (/ -3 1000)}}
    {:name :metalworking
     :prereqs #{:fire}
     :event-chances {:war-over-metal (/ +3 1000)
@@ -191,7 +220,8 @@
                     :war-over-metal (/ -1 1000)
                     :forest-fire (/ -2 1000)
                     :conqueror (/ +2 1000)
-                    :pets (/ +1 1000)}}
+                    :pets (/ +1 1000)
+                    :religion (/ +3 1000)}}
    {:name :mathematics
     :prereqs #{:writing :astronomy}}
    {:name :sailing
@@ -201,7 +231,8 @@
    {:name :architecture
     :prereqs #{:construction :mathematics}
     :event-chances {:large-city (/ +5 1000)
-                    :city-fire (/ -1 1000)}}
+                    :city-fire (/ -1 1000)
+                    :religion (/ +5 1000)}}
    {:name :plumbing
     :prereqs #{:construction :metalworking}
     :event-chances {:large-city (/ +3 1000)
@@ -333,16 +364,17 @@
                           " planet " planet " in the " system " system. "
                           "They are " trait1 ", " trait2 ", and " trait3 ". ")}]
      :vocab {:beast (gen-word language)
+             :city (gen-caps-name)
+             :conqueror (gen-caps-name)
              :crop (gen-word language)
              :fish (gen-word language)
              :pet (gen-word language)
-             :system system
              :planet planet
-             :city (gen-caps-name)
-             :conqueror (gen-caps-name)}
+             :religion (gen-caps-word)
+             :system system}
      :event-chances {:asteroid (/ +1 1000)
                      :volcano (/ +1 1000)
-                     :food-illness (/ +2.5 1000)
+                     :food-illness (/ +1 1000)
                      :gamma-ray-burst (/ +1 3000)
                      :pets (/ +1 1000)}}))
 
