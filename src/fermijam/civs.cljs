@@ -5,9 +5,25 @@
 
 ;;; events
 
-(def extinction-events
-  #{:asteroid :volcano :gamma-ray-burst :food-illness :overhunting :overfishing
-    :crop-failure :forest-fire :war-over-metal :city-plague :sea-plague})
+(def event-info
+  {;; initial extinction events
+   :asteroid {:type :extinction}
+   :volcano {:type :extinction}
+   :gamma-ray-burst {:type :extinction}
+   :food-illness {:type :extinction}
+   ;; food-related extinction events
+   :overhunting {:type :extinction}
+   :overfishing {:type :extinction}
+   :crop-failure {:type :extinction}
+   ;; second-tier tech-related extinction events
+   :forest-fire {:type :extinction}
+   :war-over-metal {:type :extinction}
+   :city-plague {:type :extinction}
+   :sea-plague {:type :extinction}
+   ;; flavor events
+   :pets {:event-chances {:pets -1}}
+   :large-city {:event-chances {:large-city -1}}
+   :conqueror {:event-chances {:conqueror -1}}})
 
 (defmulti desc-for-event #(-> %2))
 
@@ -94,10 +110,49 @@
        "germs that caused the disease, the majority of the " (:name civ)
        " population was wiped out by the ensuing plague."))
 
+(defmethod desc-for-event :pets [{:keys [vocab] :as civ} _ stardate]
+  (str "The " (:name civ) " have domesticated a species of small "
+       (rand-nth ["flying" "feathered" "fluffy" "furry" "scaly" "winged"]) " "
+       (rand-nth ["animals" "creatures" "predators"]) " known as " (vocab :pet)
+       ". The pets assist their " (:name civ) " owners with "
+       (rand-nth ["hunting" "navigation" "pest control"]) " in exchange for "
+       "food and shelter."))
+
+(defmethod desc-for-event :large-city [{:keys [vocab] :as civ} _ stardate]
+  (str "In " stardate ", the " (:name civ) " population reached 25 million "
+       "individuals. Many of these " (rand-nth ["dwell" "live" "reside"]) " "
+       "within permanent cities, the largest of which is known as "
+       (vocab :city) " and has a population of " (+ 15 (rand-int 80)) ",000."))
+
+(defmethod desc-for-event :conqueror [{:keys [vocab] :as civ} _ stardate]
+  (str "In " stardate ", many of the "
+       (rand-nth ["disparate" "fractious" "warring"]) " " (:name civ) " "
+       (rand-nth ["city-states" "clans" "kingdoms" "tribes" "villages"]) " "
+       "were united under a single banner by an individual known as "
+       (vocab :conqueror)
+       (when (> (rand) 0.5)
+         (str " the "
+              (rand-nth ["Conqueror" "Great" "Magnificent" "Merciful" "Ruthless"])))
+       ". The resulting empire has its capital at " (vocab :city) " and rules "
+       "over approximately " (+ 5 (rand-int 40)) "% of the entire " (:name civ)
+       " population. "
+       (rand-nth [(str "Like many other " (:name civ) " states, ")
+                  (str "Unusually for the " (:name civ) ", ")])
+       "it is governed by "
+       (rand-nth
+         ["direct democratic vote"
+          (str "a council of "
+               (rand-nth ["aristocrats" "clerics" "elders" "oligarchs" "war leaders"]))
+          "a hereditary monarch"
+          "an elected tyrant"])
+       "."))
+
 (defn perform-event [civ event stardate]
-  (-> civ
-      (update :events conj {:desc (desc-for-event civ event stardate)})
-      (cond-> (contains? extinction-events event) (assoc :extinct? true))))
+  (let [info (event-info event)]
+    (-> civ
+        (update :events conj {:desc (desc-for-event civ event stardate)})
+        (update :event-chances #(merge-with + % (:event-chances info)))
+        (cond-> (= (:type info) :extinction) (assoc :extinct? true)))))
 
 ;;; techs
 
@@ -105,17 +160,21 @@
   [{:name :toolmaking
     :event-chances {:overhunting (/ +4 1000)
                     :overfishing (/ -3 1000)
-                    :crop-failure (/ -3 1000)}}
+                    :crop-failure (/ -3 1000)
+                    :pets (/ +3 1000)
+                    :conqueror (/ +1 1000)}}
    {:name :agriculture
     :event-chances {:overhunting (/ -3 1000)
                     :overfishing (/ -3 1000)
-                    :crop-failure (/ +4 1000)}}
+                    :crop-failure (/ +4 1000)
+                    :pets (/ +4 1000)}}
    {:name :fishing
     :event-chances {:overhunting (/ -3 1000)
                     :overfishing (/ +4 1000)
                     :crop-failure (/ -3 1000)}}
    {:name :writing
-    :event-chances {:war-over-metal (/ -2 1000)}}
+    :event-chances {:war-over-metal (/ -2 1000)
+                    :conqueror (/ +3 1000)}}
    {:name :astronomy}
    {:name :fire
     :prereqs #{:toolmaking}
@@ -123,23 +182,30 @@
                     :food-illness (/ -2.5 1000)}}
    {:name :metalworking
     :prereqs #{:fire}
-    :event-chances {:war-over-metal (/ +3 1000)}}
+    :event-chances {:war-over-metal (/ +3 1000)
+                    :conqueror (/ +4 1000)}}
    {:name :construction
     :prereqs #{:toolmaking :agriculture}
-    :event-chances {:city-plague (/ +2 1000)
+    :event-chances {:large-city (/ +1 1000)
+                    :city-plague (/ +2 1000)
                     :war-over-metal (/ -1 1000)
-                    :forest-fire (/ -2 1000)}}
+                    :forest-fire (/ -2 1000)
+                    :conqueror (/ +2 1000)
+                    :pets (/ +1 1000)}}
    {:name :mathematics
     :prereqs #{:writing :astronomy}}
    {:name :sailing
     :prereqs #{:astronomy :construction :fishing}
-    :event-chances {:sea-plague (/ +2 1000)}}
+    :event-chances {:sea-plague (/ +2 1000)
+                    :large-city (/ +1 1000)}}
    {:name :architecture
     :prereqs #{:construction :mathematics}
-    :event-chances {:city-fire (/ -1 1000)}}
+    :event-chances {:large-city (/ +5 1000)
+                    :city-fire (/ -1 1000)}}
    {:name :plumbing
     :prereqs #{:construction :metalworking}
-    :event-chances {:city-plague (/ -2 1000)
+    :event-chances {:large-city (/ +3 1000)
+                    :city-plague (/ -2 1000)
                     :sea-plague (/ -1 1000)}}
    {:name :optics
     :prereqs #{:mathematics :metalworking}}])
@@ -248,14 +314,17 @@
 (defn gen-civ [stardate]
   (let [language (gen-language)
         gen-caps-word #(str/capitalize (gen-word language))
-        species-name (gen-caps-word)
+        gen-caps-name #(if (zero? (rand-int 5))
+                         (str (gen-caps-word) " " (gen-caps-word))
+                         (gen-caps-word))
+        species (gen-caps-word)
         [trait1 trait2 trait3] (pick-n 3 all-traits)
-        system (gen-caps-word)
-        planet (gen-caps-word)]
-    {:name species-name
+        system (gen-caps-name)
+        planet (gen-caps-name)]
+    {:name species
      :language language
      :knowledge #{}
-     :events [{:desc (str "We first became aware of the " species-name " in " stardate ". "
+     :events [{:desc (str "We first became aware of the " species " in " stardate ". "
                           "They " (rand-nth ["inhabit" "reside on"]) " the "
                           (rand-nth ["abundant" "arid" "barren" "chilly" "cold" "dry" "dusty"
                                      "frigid" "humid" "lush" "misty" "overgrown" "rainy" "rocky"
@@ -266,15 +335,16 @@
      :vocab {:beast (gen-word language)
              :crop (gen-word language)
              :fish (gen-word language)
+             :pet (gen-word language)
              :system system
              :planet planet
-             :city (if (zero? (rand-int 5))
-                     (str (gen-caps-word) " " (gen-caps-word))
-                     (gen-caps-word))}
+             :city (gen-caps-name)
+             :conqueror (gen-caps-name)}
      :event-chances {:asteroid (/ +1 1000)
                      :volcano (/ +1 1000)
                      :food-illness (/ +2.5 1000)
-                     :gamma-ray-burst (/ +1 3000)}}))
+                     :gamma-ray-burst (/ +1 3000)
+                     :pets (/ +1 1000)}}))
 
 ;;; update civs each tick
 
