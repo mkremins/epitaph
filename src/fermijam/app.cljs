@@ -43,8 +43,8 @@
               :style {:opacity (when (:extinct? data)
                                  (-> (:cycles-since-extinction data)
                                      (scale [0 (+ 160 (* 20 (count (:events data))))]
-                                            [0.75 0.03])
-                                     (max 0.03)
+                                            [0.75 0.1])
+                                     (max 0.1)
                                      (str)))}}
       (dom/div {:class "profile"}
         (dom/h3 {:class "name"} (:name data)))
