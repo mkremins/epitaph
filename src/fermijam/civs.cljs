@@ -200,7 +200,7 @@
                     :crop-failure (/ -3 1000)
                     :food-illness (/ +1 1000)}}
    {:name :writing
-    :event-chances {:war-over-metal (/ -2 1000)
+    :event-chances {:war-over-metal (/ -1 1000)
                     :conqueror (/ +3 1000)
                     :religion (/ +1 1000)}}
    {:name :astronomy
@@ -227,7 +227,8 @@
    {:name :sailing
     :prereqs #{:astronomy :construction :fishing}
     :event-chances {:sea-plague (/ +2 1000)
-                    :large-city (/ +1 1000)}}
+                    :large-city (/ +1 1000)
+                    :war-over-metal (/ -2 1000)}}
    {:name :architecture
     :prereqs #{:construction :mathematics}
     :event-chances {:large-city (/ +5 1000)
