@@ -5,6 +5,9 @@
             [om-tools.core :refer-macros [defcomponent]]
             [om-tools.dom :as dom]))
 
+(def synth
+  (.toMaster (js/Tone.Synth.)))
+
 (defn scale
   "Converts the number `x` from the scale `[old-min old-max]` to the scale
    `[new-min new-max]`."
@@ -22,6 +25,26 @@
 (defn can-intervene? [state]
   (< (+ (:last-intervened state) 10) (:stardate state)))
 
+(defn play-notification-sound! [pitch]
+  (prn pitch)
+  (.triggerAttackRelease synth pitch "8n"))
+
+(defn get-notification-pitch [old-civs new-civs]
+  (cond
+    (> (count new-civs) (count old-civs))
+      (:notification-pitch (peek new-civs))
+    (> (count (filter :extinct? new-civs))
+       (count (filter :extinct? old-civs)))
+      "C3"
+    :else
+      (let [civs-with-new-events
+            (->> (range (count old-civs))
+                 (filter #(> (count (:events (nth new-civs %)))
+                             (count (:events (nth old-civs %)))))
+                 (map new-civs))]
+        (when (seq civs-with-new-events)
+          (rand-nth (mapv :notification-pitch civs-with-new-events))))))
+
 (defn tick []
   (om/transact! (om/root-cursor app-state)
     (fn [state]
@@ -31,6 +54,8 @@
             new-civ-chance (if (every? :extinct? civs) (/ 1 50) (/ 1 250))
             civs (cond-> civs (< (rand) new-civ-chance)
                               (conj (gen-civ new-stardate)))]
+        (when-let [pitch (get-notification-pitch (:civs state) civs)]
+          (play-notification-sound! pitch))
         (assoc state :civs civs :stardate new-stardate)))))
 
 (defcomponent event-view [data owner]
@@ -62,6 +87,7 @@
                   (dom/a {:href "#"
                           :on-click (fn [e]
                                       (.preventDefault e)
+                                      (play-notification-sound! (:notification-pitch data))
                                       (om/transact! data []
                                         #(discover % tech (:stardate @app-state)))
                                       (om/transact! (om/root-cursor app-state) []
@@ -85,6 +111,7 @@
 (defn init []
   (enable-console-print!)
   (om/root app app-state {:target (js/document.getElementById "app")})
+  (play-notification-sound! (:notification-pitch (first (:civs @app-state))))
   (js/setInterval tick 500))
 
 (init)
