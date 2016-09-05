@@ -325,7 +325,7 @@
    "belligerent" "boisterous" "bold" "brusque"
    "clannish" "creative" "curious"
    "daring" "delicate" "devout" "diligent" "diminutive" "duplicitous"
-   "elegant" "enduring" "enthusiastic"
+   "elegant" "enduring" "enterprising" "enthusiastic"
    "fearful" "flamboyant"
    "gentle"
    "harmless" "honest" "honorable" "humble"
