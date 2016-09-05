@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>fermi gardener</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
   <style>
   * {
@@ -39,7 +40,7 @@
     width: 280px;
   }
   .civ p {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
   .civ.extinct .profile .name {
     text-decoration: line-through;
@@ -66,6 +67,10 @@
   }
   .system {
     font-style: italic;
+  }
+  @media (max-width: 480px) {
+    .civ { width: 90%; }
+    .civ p { font-size: 0.9375rem; }
   }
   </style>
 </head>
