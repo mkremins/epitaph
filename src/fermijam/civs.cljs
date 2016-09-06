@@ -3,30 +3,157 @@
             [fermijam.language :refer [gen-language gen-word]]
             [fermijam.rand :refer [pick-n]]))
 
-;;; events
+;;; non-tech event table
 
 (def event-info
   {;; initial extinction events
-   :asteroid {:type :extinction}
-   :volcano {:type :extinction}
-   :gamma-ray-burst {:type :extinction}
-   :food-illness {:type :extinction}
+   :asteroid
+   {:name :asteroid
+    :extinction? true}
+   :volcano
+   {:name :volcano
+    :extinction? true}
+   :gamma-ray-burst
+   {:name :gamma-ray-burst
+    :extinction? true}
+   :food-illness
+   {:name :food-illness
+    :extinction? true}
    ;; food-related extinction events
-   :overhunting {:type :extinction}
-   :overfishing {:type :extinction}
-   :crop-failure {:type :extinction}
+   :overhunting
+   {:name :overhunting
+    :extinction? true}
+   :overfishing
+   {:name :overfishing
+    :extinction? true}
+   :crop-failure
+   {:name :crop-failure
+    :extinction? true}
    ;; second-tier tech-related extinction events
-   :forest-fire {:type :extinction}
-   :war-over-metal {:type :extinction}
-   :city-plague {:type :extinction}
-   :sea-plague {:type :extinction}
-   ;; flavor events
-   :pets {:event-chances {:pets -1}}
-   :large-city {:event-chances {:large-city -1}}
-   :conqueror {:event-chances {:conqueror -1}}
-   :religion {:event-chances {:religion -1}}})
+   :forest-fire
+   {:name :forest-fire
+    :extinction? true}
+   :war-over-metal
+   {:name :war-over-metal
+    :extinction? true}
+   :city-plague
+   {:name :city-plague
+    :extinction? true}
+   :sea-plague
+   {:name :sea-plague
+    :extinction? true}
+   ;; early flavor events
+   :pets
+   {:name :pets}
+   :large-city
+   {:name :large-city
+    :event-chances {:city-fortress (/ +3 1000)
+                    :city-holy (/ +3 1000)
+                    :city-trade (/ +3 1000)}}
+   :conqueror
+   {:name :conqueror
+    :event-chances {:city-fortress (/ +10 1000)}}
+   :religion
+   {:name :religion
+    :event-chances {:city-holy (/ +10 1000)}}
+   ;; city flavor events (mutually exclusive)
+   :city-fortress
+   {:name :city-fortress
+    :prereqs #{:large-city}
+    :event-chances {:city-holy -1
+                    :city-trade -1}}
+   :city-holy
+   {:name :city-holy
+    :prereqs #{:large-city}
+    :event-chances {:city-fortress -1
+                    :city-trade -1}}
+   :city-trade
+   {:name :city-trade
+    :prereqs #{:large-city}
+    :event-chances {:city-fortress -1
+                    :city-holy -1}}})
 
-(defmulti desc-for-event #(-> %2))
+;;; tech table
+
+(def all-techs
+  [{:name :toolmaking
+    :event-chances {:overhunting (/ +4 1000)
+                    :overfishing (/ -3 1000)
+                    :crop-failure (/ -3 1000)
+                    :food-illness (/ +1 1000)
+                    :pets (/ +3 1000)
+                    :conqueror (/ +1 1000)}}
+   {:name :agriculture
+    :event-chances {:overhunting (/ -3 1000)
+                    :overfishing (/ -3 1000)
+                    :crop-failure (/ +4 1000)
+                    :pets (/ +4 1000)}}
+   {:name :fishing
+    :event-chances {:overhunting (/ -3 1000)
+                    :overfishing (/ +4 1000)
+                    :crop-failure (/ -3 1000)
+                    :food-illness (/ +1 1000)}}
+   {:name :writing
+    :event-chances {:war-over-metal (/ -1 1000)
+                    :conqueror (/ +3 1000)
+                    :religion (/ +1 1000)}}
+   {:name :astronomy
+    :event-chances {:religion (/ +1 1000)}}
+   {:name :fire
+    :prereqs #{:toolmaking}
+    :event-chances {:forest-fire (/ +2 1000)
+                    :food-illness (/ -3 1000)}}
+   {:name :metalworking
+    :prereqs #{:fire}
+    :event-chances {:war-over-metal (/ +3 1000)
+                    :conqueror (/ +4 1000)}}
+   {:name :construction
+    :prereqs #{:toolmaking :agriculture}
+    :event-chances {:large-city (/ +1 1000)
+                    :city-plague (/ +2 1000)
+                    :war-over-metal (/ -1 1000)
+                    :forest-fire (/ -2 1000)
+                    :conqueror (/ +2 1000)
+                    :pets (/ +1 1000)
+                    :religion (/ +3 1000)}}
+   {:name :mathematics
+    :prereqs #{:writing :astronomy}}
+   {:name :sailing
+    :prereqs #{:astronomy :construction :fishing}
+    :event-chances {:sea-plague (/ +2 1000)
+                    :large-city (/ +1 1000)
+                    :war-over-metal (/ -2 1000)
+                    :city-trade (/ +7 1000)}}
+   {:name :architecture
+    :prereqs #{:construction :mathematics}
+    :event-chances {:large-city (/ +5 1000)
+                    :city-fire (/ -1 1000)
+                    :religion (/ +5 1000)}}
+   {:name :plumbing
+    :prereqs #{:construction :metalworking}
+    :event-chances {:large-city (/ +3 1000)
+                    :city-plague (/ -2 1000)
+                    :sea-plague (/ -1 1000)}}
+   {:name :optics
+    :prereqs #{:mathematics :metalworking}}
+   {:name :alchemy
+    :prereqs #{:mathematics :metalworking}}])
+
+;;; generic event processing
+
+(defmulti desc-for-event (fn [_ event _] (:name event)))
+
+(defn has-prereqs? [civ event]
+  (every? #(contains? (:knowledge civ) %) (:prereqs event)))
+
+(defn process-event [civ event stardate]
+  (-> civ
+      (update :knowledge conj (:name event))
+      (update :events conj {:desc (desc-for-event civ event stardate)})
+      (update :event-chances #(merge-with + % (:event-chances event)))
+      (cond-> (:extinction? event) (assoc :extinct? true))))
+
+;;; descriptions for non-tech events
 
 (defmethod desc-for-event :asteroid [{:keys [vocab] :as civ} _ stardate]
   (str "In " stardate ", " (vocab :planet) " collided with a "
@@ -134,9 +261,14 @@
        (when (> (rand) 0.5)
          (str " the "
               (rand-nth ["Conqueror" "Great" "Magnificent" "Merciful" "Ruthless"])))
-       ". The resulting empire has its capital at " (vocab :city) " and rules "
-       "over approximately " (+ 5 (rand-int 40)) "% of the entire " (:name civ)
-       " population. "
+       ". "
+       (rand-nth [(str "The resulting empire has its capital at " (vocab :city)
+                       " and ")
+                  (str "The city of " (vocab :city) " "
+                       (rand-nth ["becomes" "is declared" "is made" "is named"])
+                       " the capital of the resulting empire, which ")])
+       "rules over approximately " (+ 5 (rand-int 40)) "% of the entire "
+       (:name civ) " population. "
        (rand-nth [(str "Like many other " (:name civ) " states, ")
                   (str "Unusually for the " (:name civ) ", ")])
        "it is governed by "
@@ -172,85 +304,53 @@
                   "hoods" "masks" "robes" "shawls"])
        " to mark themselves as believers."))
 
-(defn perform-event [civ event stardate]
-  (let [info (event-info event)]
-    (-> civ
-        (update :events conj {:desc (desc-for-event civ event stardate)})
-        (update :event-chances #(merge-with + % (:event-chances info)))
-        (cond-> (= (:type info) :extinction) (assoc :extinct? true)))))
+(defmethod desc-for-event :city-fortress [{:keys [vocab] :as civ} _ stardate]
+  (str "Following a long series of failed attempts to "
+       (rand-nth ["attack" "besiege" "capture" "conquer"])
+       " the city, " (vocab :city) " has become renowned among the "
+       (:name civ) " as an impenetrable fortress. The image of its "
+       "distinctive " (rand-nth ["ramparts" "towers" "walls"]) " has been "
+       "widely adopted in " (:name civ) " "
+       (rand-nth ["art" "culture" "literature" "oratory"]) " as a symbol of "
+       (rand-nth ["resilience" "safety" "strength"]) "."))
 
-;;; techs
+(defmethod desc-for-event :city-holy [{:keys [vocab] :as civ} _ stardate]
+  (str "Due to its role as the birthplace of several major " (:name civ) " "
+       "religions, including the especially prominent " (vocab :religion) " "
+       "faith, the city of " (vocab :city) " is regarded by many of the "
+       (:name civ) " as a holy site. "
+       (rand-nth
+         [(str "The "
+               (rand-nth [(str "highest-ranking " (vocab :religion) " "
+                               (rand-nth ["bishop" "official" "priest"]) " in ")
+                          "archbishop of "
+                          "high priest of "])
+               (vocab :city) " is considered the de facto leader of the "
+               (vocab :religion) " church as a whole, and pilgrimages to the "
+               "city are commonplace.")
+          (str "Leaders from all around the world "
+               (rand-nth ["journey to" "make trips to" "travel to" "visit"])
+               " the city "
+               (rand-nth ["in hopes of currying" "in order to curry"]) "favor "
+               "with the leaders of their people's religion of choice.")])))
 
-(def all-techs
-  [{:name :toolmaking
-    :event-chances {:overhunting (/ +4 1000)
-                    :overfishing (/ -3 1000)
-                    :crop-failure (/ -3 1000)
-                    :food-illness (/ +1 1000)
-                    :pets (/ +3 1000)
-                    :conqueror (/ +1 1000)}}
-   {:name :agriculture
-    :event-chances {:overhunting (/ -3 1000)
-                    :overfishing (/ -3 1000)
-                    :crop-failure (/ +4 1000)
-                    :pets (/ +4 1000)}}
-   {:name :fishing
-    :event-chances {:overhunting (/ -3 1000)
-                    :overfishing (/ +4 1000)
-                    :crop-failure (/ -3 1000)
-                    :food-illness (/ +1 1000)}}
-   {:name :writing
-    :event-chances {:war-over-metal (/ -1 1000)
-                    :conqueror (/ +3 1000)
-                    :religion (/ +1 1000)}}
-   {:name :astronomy
-    :event-chances {:religion (/ +1 1000)}}
-   {:name :fire
-    :prereqs #{:toolmaking}
-    :event-chances {:forest-fire (/ +2 1000)
-                    :food-illness (/ -3 1000)}}
-   {:name :metalworking
-    :prereqs #{:fire}
-    :event-chances {:war-over-metal (/ +3 1000)
-                    :conqueror (/ +4 1000)}}
-   {:name :construction
-    :prereqs #{:toolmaking :agriculture}
-    :event-chances {:large-city (/ +1 1000)
-                    :city-plague (/ +2 1000)
-                    :war-over-metal (/ -1 1000)
-                    :forest-fire (/ -2 1000)
-                    :conqueror (/ +2 1000)
-                    :pets (/ +1 1000)
-                    :religion (/ +3 1000)}}
-   {:name :mathematics
-    :prereqs #{:writing :astronomy}}
-   {:name :sailing
-    :prereqs #{:astronomy :construction :fishing}
-    :event-chances {:sea-plague (/ +2 1000)
-                    :large-city (/ +1 1000)
-                    :war-over-metal (/ -2 1000)}}
-   {:name :architecture
-    :prereqs #{:construction :mathematics}
-    :event-chances {:large-city (/ +5 1000)
-                    :city-fire (/ -1 1000)
-                    :religion (/ +5 1000)}}
-   {:name :plumbing
-    :prereqs #{:construction :metalworking}
-    :event-chances {:large-city (/ +3 1000)
-                    :city-plague (/ -2 1000)
-                    :sea-plague (/ -1 1000)}}
-   {:name :optics
-    :prereqs #{:mathematics :metalworking}}
-   {:name :alchemy
-    :prereqs #{:mathematics :metalworking}}])
+(defmethod desc-for-event :city-trade [{:keys [vocab] :as civ} _ stardate]
+  (let [things (rand-nth ["armor" "ceramics" "clothing" "fabrics" "glassware"
+                          "jewelry" "pottery" "textiles" "weapons"])]
+    (str "The city of " (vocab :city) " has become renowed among the "
+         (:name civ) " as a center of commerce and trade. In particular, the "
+         (rand-nth ["delicate" "durable" "elegant" "fine" "high-quality"
+                    "intricately decorated" "sturdy"])
+         " " things " produced there " (if (= (last things) "s") "are" "is")
+         " highly sought after by traders around the world.")))
 
-(defmulti desc-for-tech (fn [_ tech _] (:name tech)))
+;;; descriptions for techs
 
-(defmethod desc-for-tech :toolmaking [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :toolmaking [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " use stone tools for many things, "
        "including as weapons when hunting the wild " (vocab :beast) "."))
 
-(defmethod desc-for-tech :agriculture [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :agriculture [{:keys [vocab] :as civ} _ stardate]
   (let [a-kind-of-x
         (str "a kind of "
              (rand-nth ["bitter" "chewy" "colorful" "fleshy" "hardy" "sour"
@@ -259,80 +359,81 @@
              (rand-nth ["cactus" "flower" "fruit" "fungus" "grain" "leaf"
                         "lichen" "moss" "mushroom" "nut" "root" "seaweed"
                         "seedpod" "stalk" "vegetable" "vine"]))]
-    (str "The " (:name civ) " have begun to cultivate crops. "
-         (rand-nth ["One especially popular crop is "
-                    "They are especially fond of "])
+    (str "The " (:name civ) " have begun to cultivate crops"
+         (rand-nth [", including "
+                    ". One especially popular crop is "
+                    ". They are especially fond of "])
          (rand-nth [(str a-kind-of-x " known as " (vocab :crop))
                     (str (vocab :crop) ", " a-kind-of-x)])
-         (when (< (rand) (/ 1 4))
-           (str " that grows well in the dominant climate of " (vocab :planet)))
+         (when (< (rand) (/ 1 3))
+           (str " that grows well "
+                (rand-nth
+                  [(str "in the "
+                        (rand-nth ["dense forests" "deserts" "dominant climate"
+                                   "fertile soil" "forests" "grasslands"
+                                   "jungles" "soil" "rainforests" "rocky soil"
+                                   "scrublands"])
+                        " of")
+                   (str "on the "
+                        (rand-nth ["floodplains" "plains" "riverbanks"])
+                        " of")])
+                " " (vocab :planet)))
          ".")))
 
-(defmethod desc-for-tech :fishing [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :fishing [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have learned how to catch water-dwelling creatures "
        "such as the " (vocab :fish) ", which are now "
        (rand-nth ["an important" "a staple"]) " part of the " (:name civ) " diet."))
 
-(defmethod desc-for-tech :writing [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :writing [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have developed a simple system of writing, "
        "which they use primarily for "
        (rand-nth ["poetry" "record-keeping" "storytelling" "worship"]) "."))
 
-(defmethod desc-for-tech :astronomy [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :astronomy [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have begun to watch the skies and recognize patterns "
        "in the movements of stars, which they use to navigate over great distances "
        "and keep track of time."))
 
-(defmethod desc-for-tech :fire [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :fire [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have mastered the control of fire. "
        "They use it to cook their food, and to light their villages at night."))
 
-(defmethod desc-for-tech :metalworking [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :metalworking [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have discovered how to forge molten metal into "
        "jewelry, tools, weapons, and armor."))
 
-(defmethod desc-for-tech :construction [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :construction [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have begun to construct permanent dwellings and "
        "other structures using materials such as wood and stone."))
 
-(defmethod desc-for-tech :mathematics [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :mathematics [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have developed a sophisticated understanding of "
        "basic mathematics, such as arithmetic, algebra, and geometry."))
 
-(defmethod desc-for-tech :sailing [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :sailing [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have learned how to build ships and sail them "
        "across the oceans of " (vocab :planet) " to explore and trade over "
        "increasingly greater distances."))
 
-(defmethod desc-for-tech :architecture [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :architecture [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have begun to make use of more sophisticated "
        "construction techniques, relying on sturdy structural elements such "
        "as arches and buttresses to support larger and larger buildings."))
 
-(defmethod desc-for-tech :plumbing [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :plumbing [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have built elaborate pipe and sewer systems to "
        "supply their larger settlements, such as " (vocab :city) ", with "
        "fresh water and a hygenic means of waste disposal."))
 
-(defmethod desc-for-tech :optics [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :optics [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have begun to use lenses and mirrors made from "
        "polished crystal, glass, and water to redirect and focus light."))
 
-(defmethod desc-for-tech :alchemy [{:keys [vocab] :as civ} _ stardate]
+(defmethod desc-for-event :alchemy [{:keys [vocab] :as civ} _ stardate]
   (str "Some of the " (:name civ) " have begun to experiment with alchemy, "
        "systematically searching for new ways of combining and manipulating "
        "ingredients to yield useful chemicals, compounds, and medicines."))
-
-(defn possible-techs [civ]
-  (->> all-techs
-       (remove #(contains? (:knowledge civ) (:name %)))
-       (filter #(every? (partial contains? (:knowledge civ)) (:prereqs %)))))
-
-(defn discover [civ tech stardate]
-  (-> civ
-      (update :knowledge conj (:name tech))
-      (update :event-chances #(merge-with + % (:event-chances tech)))
-      (update :events conj {:desc (desc-for-tech civ tech stardate)})))
 
 ;;; generate civs
 
@@ -398,19 +499,32 @@
 
 ;;; update civs each tick
 
+(defn possible-event-chances [civ]
+  (->> (:event-chances civ)
+       (filter #(pos? (second %)))
+       (map #(-> [(event-info (first %)) (second %)]))
+       (remove #(contains? (:knowledge civ) (:name (first %))))
+       (filter #(has-prereqs? civ (first %)))
+       (shuffle)))
+
+(defn possible-techs [civ]
+  (->> all-techs
+       (remove #(contains? (:knowledge civ) (:name %)))
+       (filter #(has-prereqs? civ %))))
+
 (defn maybe-select-event [civ]
-  (loop [event-chances (shuffle (:event-chances civ))]
-    (when-let [[event chance] (first event-chances)]
+  (loop [event-chances (possible-event-chances civ)]
+    (if-let [[event chance] (first event-chances)]
       (if (< (rand) chance)
         event
-        (recur (rest event-chances))))))
+        (recur (rest event-chances)))
+      ;; if no event selected, maybe (1/100 chance) select a tech
+      (let [techs (possible-techs civ)]
+        (when (and (seq techs) (< (rand) (/ 1 100)))
+          (rand-nth techs))))))
 
 (defn civ-tick [civ stardate]
   (if (:extinct? civ)
     (update civ :cycles-since-extinction (fnil inc 0))
-    (if-let [event (maybe-select-event civ)]
-      (perform-event civ event stardate)
-      (let [techs (possible-techs civ)]
-        ;; every non-extinct civ has a chance to advance on its own each tick
-        (cond-> civ (and (seq techs) (< (rand) (/ 1 100)))
-                    (discover (rand-nth techs) stardate))))))
+    (let [event (maybe-select-event civ)]
+      (cond-> civ event (process-event event stardate)))))

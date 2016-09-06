@@ -1,6 +1,6 @@
 (ns fermijam.app
   (:require [clojure.string :as str]
-            [fermijam.civs :refer [civ-tick discover gen-civ possible-techs]]
+            [fermijam.civs :refer [civ-tick gen-civ possible-techs process-event]]
             [om.core :as om]
             [om-tools.core :refer-macros [defcomponent]]
             [om-tools.dom :as dom]))
@@ -89,7 +89,7 @@
                                       (.preventDefault e)
                                       (play-notification-sound! (:notification-pitch data))
                                       (om/transact! data []
-                                        #(discover % tech (:stardate @app-state)))
+                                        #(process-event % tech (:stardate @app-state)))
                                       (om/transact! (om/root-cursor app-state) []
                                         #(assoc % :last-intervened (:stardate %))))}
                     (name (:name tech))))
