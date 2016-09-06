@@ -331,7 +331,7 @@
           (str "Leaders from all around the world "
                (rand-nth ["journey to" "make trips to" "travel to" "visit"])
                " the city "
-               (rand-nth ["in hopes of currying" "in order to curry"]) "favor "
+               (rand-nth ["in hopes of currying" "in order to curry"]) " favor "
                "with the leaders of their people's religion of choice.")])))
 
 (defmethod desc-for-event :city-trade [{:keys [vocab] :as civ} _ stardate]
