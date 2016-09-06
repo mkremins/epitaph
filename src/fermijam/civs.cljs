@@ -240,6 +240,8 @@
                     :city-plague (/ -2 1000)
                     :sea-plague (/ -1 1000)}}
    {:name :optics
+    :prereqs #{:mathematics :metalworking}}
+   {:name :alchemy
     :prereqs #{:mathematics :metalworking}}])
 
 (defmulti desc-for-tech (fn [_ tech _] (:name tech)))
@@ -249,14 +251,22 @@
        "including as weapons when hunting the wild " (vocab :beast) "."))
 
 (defmethod desc-for-tech :agriculture [{:keys [vocab] :as civ} _ stardate]
-  (str "The " (:name civ) " have begun to cultivate crops. "
-       "They are especially fond of " (vocab :crop) ", a kind of "
-       (rand-nth ["bitter" "chewy" "colorful" "fleshy" "hardy" "sour" "sweet"
-                  "tasty" "tough"])
-       " "
-       (rand-nth ["cactus" "flower" "fruit" "fungus" "grain" "leaf" "lichen"
-                  "moss" "mushroom" "nut" "root" "seedpod" "stalk" "vine"])
-       " that grows well in the dominant climate of " (vocab :planet) "."))
+  (let [a-kind-of-x
+        (str "a kind of "
+             (rand-nth ["bitter" "chewy" "colorful" "fleshy" "hardy" "sour"
+                        "sweet" "tasty" "tough"])
+             " "
+             (rand-nth ["cactus" "flower" "fruit" "fungus" "grain" "leaf"
+                        "lichen" "moss" "mushroom" "nut" "root" "seaweed"
+                        "seedpod" "stalk" "vegetable" "vine"]))]
+    (str "The " (:name civ) " have begun to cultivate crops. "
+         (rand-nth ["One especially popular crop is "
+                    "They are especially fond of "])
+         (rand-nth [(str a-kind-of-x " known as " (vocab :crop))
+                    (str (vocab :crop) ", " a-kind-of-x)])
+         (when (< (rand) (/ 1 4))
+           (str " that grows well in the dominant climate of " (vocab :planet)))
+         ".")))
 
 (defmethod desc-for-tech :fishing [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have learned how to catch water-dwelling creatures "
@@ -307,6 +317,11 @@
 (defmethod desc-for-tech :optics [{:keys [vocab] :as civ} _ stardate]
   (str "The " (:name civ) " have begun to use lenses and mirrors made from "
        "polished crystal, glass, and water to redirect and focus light."))
+
+(defmethod desc-for-tech :alchemy [{:keys [vocab] :as civ} _ stardate]
+  (str "Some of the " (:name civ) " have begun to experiment with alchemy, "
+       "systematically searching for new ways of combining and manipulating "
+       "ingredients to yield useful chemicals, compounds, and medicines."))
 
 (defn possible-techs [civ]
   (->> all-techs
