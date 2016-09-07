@@ -26,7 +26,6 @@
   (< (+ (:last-intervened state) 10) (:stardate state)))
 
 (defn play-notification-sound! [pitch]
-  (prn pitch)
   (.triggerAttackRelease synth pitch "8n"))
 
 (defn get-notification-pitch [old-civs new-civs]
