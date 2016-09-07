@@ -1,7 +1,7 @@
-(ns fermijam.civs
+(ns epitaph.civs
   (:require [clojure.string :as str]
-            [fermijam.language :refer [gen-language gen-word]]
-            [fermijam.rand :refer [pick-n]]))
+            [epitaph.language :refer [gen-language gen-word]]
+            [epitaph.rand :refer [pick-n]]))
 
 ;;; non-tech event table
 

@@ -1,6 +1,6 @@
-(ns fermijam.language
+(ns epitaph.language
   (:require [clojure.string :as str]
-            [fermijam.rand :refer [biased-rand-nth pick-n restricted]]))
+            [epitaph.rand :refer [biased-rand-nth pick-n restricted]]))
 
 (def all-consonants
   ["b" "b" "c" "c" "d" "d" "g" "g" "h" "h" "k" "k" "m" "m" "n" "n" "l" "p" "p"

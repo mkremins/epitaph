@@ -1,6 +1,6 @@
-(ns fermijam.app
+(ns epitaph.app
   (:require [clojure.string :as str]
-            [fermijam.civs :refer [civ-tick gen-civ possible-techs process-event]]
+            [epitaph.civs :refer [civ-tick gen-civ possible-techs process-event]]
             [om.core :as om]
             [om-tools.core :refer-macros [defcomponent]]
             [om-tools.dom :as dom]))

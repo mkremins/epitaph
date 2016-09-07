@@ -1,4 +1,4 @@
-(ns fermijam.rand)
+(ns epitaph.rand)
 
 (defn biased-rand-nth
   "Like `clojure.core/rand-nth`, but biased towards earlier items in `xs`."
