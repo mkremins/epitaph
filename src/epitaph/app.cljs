@@ -20,13 +20,15 @@
   (let [stardate (+ 2200 (rand-int 700))]
     (atom {:civs [(gen-civ stardate)]
            :stardate stardate
-           :last-intervened 0})))
+           :last-intervened 0
+           :sound-on? true})))
 
 (defn can-intervene? [state]
   (< (+ (:last-intervened state) 10) (:stardate state)))
 
 (defn play-notification-sound! [pitch]
-  (.triggerAttackRelease synth pitch "8n"))
+  (when (:sound-on? @app-state)
+    (.triggerAttackRelease synth pitch "8n")))
 
 (defn get-notification-pitch [old-civs new-civs]
   (cond
@@ -104,6 +106,9 @@
           (dom/span {}
             " | Last intervened in "
             (dom/span {:class "last-intervened"} (:last-intervened data)))))
+      (dom/div {:class "right"}
+        (dom/a {:class (if (:sound-on? data) "icon-sound-on" "icon-sound-off")
+                :on-click #(om/transact! data :sound-on? not)}))
       (dom/div {:class "civs"}
         (om/build-all civ-view (reverse (:civs data)) {:key :name})))))
 

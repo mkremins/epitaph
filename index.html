@@ -13,6 +13,7 @@
     padding: 0;
   }
   a {
+    cursor: pointer;
     text-decoration: none;
   }
   html {
@@ -24,6 +25,11 @@
   }
   .stardate {
     margin-bottom: 1rem;
+  }
+  .right {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
   }
   .cannot-intervene .last-intervened {
     color: red;
@@ -71,6 +77,41 @@
   @media (max-width: 480px) {
     .civ { width: 90%; }
     .civ p { font-size: 0.9375rem; }
+  }
+
+  /*** Icomoon icons ***/
+
+  @font-face {
+    font-family: 'icomoon';
+    src:  url('fonts/icomoon.eot?snxwb5');
+    src:  url('fonts/icomoon.eot?snxwb5#iefix') format('embedded-opentype'),
+          url('fonts/icomoon.ttf?snxwb5') format('truetype'),
+          url('fonts/icomoon.woff?snxwb5') format('woff'),
+          url('fonts/icomoon.svg?snxwb5#icomoon') format('svg');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  [class^="icon-"], [class*=" icon-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'icomoon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .icon-sound-on:before {
+    content: "\ea26";
+  }
+  .icon-sound-off:before {
+    content: "\ea2a";
   }
   </style>
 </head>
