@@ -125,4 +125,10 @@
     :prereqs #{:mathematics :metalworking}
     :desc ["Some of the $CIV have begun to experiment with alchemy, "
            "systematically searching for new ways of combining and manipulating "
-           "ingredients to yield useful chemicals, compounds, and medicines."]}])
+           "ingredients to yield useful chemicals, compounds, and medicines."]}
+
+   {:name :the-printing-press
+    :prereqs #{:architecture :metalworking}
+    :desc ["The $CIV have developed a simple printing press, and mass-produced "
+           "versions of important texts have begun to circulate widely "
+           "throughout the world."]}])

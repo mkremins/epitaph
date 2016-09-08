@@ -91,7 +91,7 @@
                                         #(process-event % tech (:stardate @app-state)))
                                       (om/transact! (om/root-cursor app-state) []
                                         #(assoc % :last-intervened (:stardate %))))}
-                    (name (:name tech))))
+                    (str/replace (name (:name tech)) #"-" " ")))
                 (dom/span part)))))))))
 
 (defcomponent app [data owner]
