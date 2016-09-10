@@ -112,9 +112,10 @@
        (shuffle)))
 
 (defn possible-techs [civ]
-  (->> all-techs
-       (remove #(contains? (:knowledge civ) (:name %)))
-       (filter #(has-prereqs? civ %))))
+  (when-not (:extinct? civ)
+    (->> all-techs
+         (remove #(contains? (:knowledge civ) (:name %)))
+         (filter #(has-prereqs? civ %)))))
 
 (defn maybe-select-event [civ]
   (loop [event-chances (possible-event-chances civ)]
