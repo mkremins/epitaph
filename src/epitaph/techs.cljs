@@ -127,8 +127,74 @@
            "systematically searching for new ways of combining and manipulating "
            "ingredients to yield useful chemicals, compounds, and medicines."]}
 
+   {:name :mill-power
+    :prereqs #{:metalworking :sailing}
+    :desc ["The $CIV have begun to construct wind and water mills, which "
+           "redirect the forces of the natural world to perform repetitive "
+           "mechanical tasks such as grinding grain and pumping water."]}
+
+   {:name :gunpowder
+    :prereqs #{:alchemy}
+    :desc ["The $CIV have discovered a way to manufacture gunpowder, which "
+           "they primarily use $IN_CONTEXT."]
+    :vocab {"$IN_CONTEXT" ["for explosive mining" "in warfare"]}}
+
    {:name :the-printing-press
     :prereqs #{:architecture :metalworking}
     :desc ["The $CIV have developed a simple printing press, and mass-produced "
            "versions of important texts have begun to circulate widely "
-           "throughout the world."]}])
+           "throughout the world. $TEXTS_ARE especially popular."]
+    :vocab {"$TEXTS_ARE" ["Light novels are"
+                          "Philosophical texts are"
+                          "Poetry is"
+                          "Political pamphlets are"
+                          "Religious texts are"
+                          "Romance novels are"
+                          "Satire is"
+                          "Scary stories are"
+                          "Serial fiction is"
+                          "Tales of heroism are"
+                          "Transcriptions of folktales are"
+                          "Works of natural philosophy are"]}}
+
+   {:name :taxonomy
+    :prereqs #{:alchemy :optics :the-printing-press}
+    :desc ["Through systematic observation and categorization of the various "
+           "living things on $PLANET, the $CIV have begun to develop a more "
+           "sophisticated understanding of biology. Some theorists have even "
+           "put forth the idea that dramatically different-looking organisms, "
+           "such as the $BEAST and the $FISH, may in fact $SHARE a single "
+           "common ancestor."]
+    :vocab {"$SHARE" ["be descended from" "share"]}}
+
+   {:name :calculus
+    :prereqs #{:optics :the-printing-press}
+    :desc ["In their efforts to understand the motion of planets in the sky, "
+           "free-falling bodies, and projectiles, the $CIV have developed a "
+           "new branch of mathematics which is immediately recognizable as "
+           "calculus."]}
+
+   {:name :steam-power
+    :prereqs #{:architecture :mill-power}
+    :desc ["The $CIV have developed a practical and cost-effective steam "
+           "engine, which can be fueled with wood or coal."]}
+
+   {:name :electromagnetism
+    :prereqs #{:alchemy :architecture :mill-power :the-printing-press}
+    :desc ["electromagnetism"]}
+
+   {:name :telegraphy
+    :prereqs #{:electromagnetism}
+    :desc ["telegraphy"]}
+
+   {:name :transistors
+    :prereqs #{:electromagnetism}
+    :desc ["transistors"]}
+
+   {:name :germ-theory
+    :prereqs #{:taxonomy}
+    :desc ["germ-theory"]}
+
+   {:name :mass-media
+    :prereqs #{:telegraphy}
+    :desc ["mass-media"]}])
