@@ -168,7 +168,7 @@
                      "elaborately decorated"
                      "intricately patterned"]
             "$ADJ5" ["dazzlingly" "distinctive"]
-            "$ADJ6" ["distinctive" ""]}}
+            "$ADJ6" ["distinctive " ""]}}
 
    ;; city flavor events (mutually exclusive)
 
