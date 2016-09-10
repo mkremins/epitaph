@@ -24,7 +24,7 @@
            :sound-on? true})))
 
 (defn can-intervene? [state]
-  (< (+ (:last-intervened state) 10) (:stardate state)))
+  (< (+ (:last-intervened state) 50) (:stardate state)))
 
 (defn play-notification-sound! [pitch]
   (when (:sound-on? @app-state)
@@ -52,7 +52,7 @@
       (let [new-stardate (inc (:stardate state))
             civs (mapv #(civ-tick % new-stardate) (:civs state))
             ;; new civs more likely to spawn if all existing civs are extinct
-            new-civ-chance (if (every? :extinct? civs) (/ 1 50) (/ 1 250))
+            new-civ-chance (if (every? :extinct? civs) (/ 1 25) (/ 1 250))
             civs (cond-> civs (< (rand) new-civ-chance)
                               (conj (gen-civ new-stardate)))]
         (when-let [pitch (get-notification-pitch (:civs state) civs)]
@@ -116,6 +116,6 @@
   (enable-console-print!)
   (om/root app app-state {:target (js/document.getElementById "app")})
   (play-notification-sound! (:notification-pitch (first (:civs @app-state))))
-  (js/setInterval tick 500))
+  (js/setInterval tick 250))
 
 (init)
