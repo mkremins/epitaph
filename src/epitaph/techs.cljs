@@ -85,7 +85,13 @@
                     :pets (/ +1 1000)
                     :religion (/ +3 1000)}
     :desc ["The $CIV have begun to construct permanent dwellings and other "
-           "structures using materials such as wood and stone."]}
+           "structures$USING $MAT as a building material."]
+    :vocab {"$USING" [", making especially extensive use of"
+                      ". They make especially extensive use of"
+                      ". They seem to favor"
+                      ". Wherever possible, they seem to prefer"]
+            "$MAT" ["brick" "bricks" "clay" "limestone" "marble" "sandstone"
+                    "stone" "the wood of the $CROP plant" "wood"]}}
 
    {:name :mathematics
     :prereqs #{:writing :astronomy}
@@ -179,6 +185,10 @@
            "new branch of mathematics which is immediately recognizable as "
            "calculus."]}
 
+   {:name :rocketry
+    :prereqs #{:calculus :gunpowder}
+    :desc ["The $CIV have begun to develop rockets."]}
+
    {:name :steam-power
     :prereqs #{:architecture :mill-power}
     :desc ["The $CIV have developed a practical and cost-effective steam "
@@ -186,31 +196,95 @@
 
    {:name :electromagnetism
     :prereqs #{:alchemy :architecture :mill-power :the-printing-press}
-    :desc ["electromagnetism"]}
+    :desc ["The $CIV have successfully tamed electricity, and are now "
+           "beginning to deploy it throughout society. Electric lights are "
+           "widespread, electric motors are used to drive factories, and "
+           "the growing need for electric power has led to the construction "
+           "of power plants near every major center of $CIV population."]}
 
    {:name :telegraphy
     :prereqs #{:electromagnetism :steam-power}
-    :desc ["telegraphy"]}
+    :desc ["The $CIV have begun harnessing the power of electricity to send "
+           "messages across very great distances with unprecedented speed. "
+           "Due to the overhead of encoding and decoding messages, "
+           "long-distance communication remains far from instantaneous, but "
+           "it is now possible for individuals on opposite sides of $PLANET "
+           "to exchange several messages over the course of a single day."]}
+
+   {:name :flight
+    :prereqs #{:calculus :electromagnetism :steam-power}
+    :desc ["The $CIV have developed flying machines which can carry them into "
+           "the skies above $PLANET."]}
 
    {:name :transistors
-    :prereqs #{:electromagnetism :calculus :steam-power}
-    :desc ["transistors"]}
+    :prereqs #{:calculus :electromagnetism :steam-power}
+    :desc ["With the development of the transistor, the $CIV have begun to "
+           "construct more sophisticated electronic circuits."]}
 
    {:name :germ-theory
     :prereqs #{:calculus :taxonomy}
     :event-chances {:city-plague (/ -1 1000)
                     :sea-plague (/ -1 1000)}
-    :desc ["germ-theory"]}
+    :desc ["$THE $IDEA that diseases $ARE caused by microorganisms has begun "
+           "to catch on among the $CIV, leading to the widespread adoption of "
+           "public health policies which have greatly reduced the spread of "
+           "disease."]
+    :vocab {"$THE" ["Although initially controversial, the"
+                    "The initially controversial" "The"]
+            "$IDEA" ["hypothesis" "idea" "theory"]
+            "$ARE" ["are" "can be"]}}
+
+   {:name :nuclear-physics
+    :prereqs #{:calculus :telegraphy}
+    :desc ["The $CIV have developed an accurate model of the internal "
+           "structure of the atom, which has also enabled them to understand "
+           "the phenomenon of radioactivity."]}
 
    {:name :mass-media
     :prereqs #{:telegraphy :calculus}
-    :desc ["mass-media"]}
+    :desc ["The $CIV have discovered that electromagnetic waves may be used "
+           "to transmit information, enabling the development and widespread "
+           "deployment of media for audiovisual broadcasting."]}
 
    {:name :digital-computers
     :prereqs #{:transistors}
-    :desc ["digital-computers"]}
+    :desc ["The $CIV have begun to build general-purpose programmable "
+           "computers."]}
+
+   {:name :quantum-physics
+    :prereqs #{:nuclear-physics}
+    :desc ["The $CIV have begun to understand quantum physics."]}
+
+   {:name :spaceflight
+    :prereqs #{:digital-computers :flight :rocketry}
+    :desc ["The $CIV have taken their first tentative steps into space, "
+           "launching craft capable of supporting several individuals into "
+           "orbit around $PLANET before retrieving them safely."]}
 
    {:name :networked-computers
     :prereqs #{:digital-computers :mass-media}
     :set-vars {:tech-chance (/ 1 15)}
-    :desc ["networked-computers"]}])
+    :desc ["The $CIV have begun to connect their computers into a single vast "
+           "network, enabling communication and collaboration on a truly "
+           "global scale."]}
+
+   {:name :artificial-intelligence
+    :prereqs #{:networked-computers}
+    :desc ["The $CIV have developed a form of artificial general intelligence "
+           "which rivals many of their own intellectual capabilities."]}
+
+   {:name :nanotechnology
+    :prereqs #{:networked-computers :quantum-physics}
+    :desc ["The $CIV have begun to experiment with the use of \"intelligent "
+           "materials\", in the form of swarms of programmable nanobots."]}
+
+   {:name :quantum-computers
+    :prereqs #{:networked-computers :quantum-physics}
+    :desc ["The $CIV have constructed their first cost-effective quantum "
+           "computers, dramatically improving their collective ability to "
+           "perform certain types of calculation."]}
+
+   {:name :FTL-communication
+    :prereqs #{:quantum-computers}
+    :desc ["The $CIV have discovered a means of sending and receiving "
+           "messages at faster-than-light speeds."]}])
