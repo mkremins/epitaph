@@ -278,6 +278,17 @@
     :desc ["The $CIV have begun to experiment with the use of \"intelligent "
            "materials\", in the form of swarms of programmable nanobots."]}
 
+   {:name :space-colonization
+    :prereqs #{:nanotechnology :networked-computers :spaceflight}
+    :event-chances {:asteroid -1
+                    :volcano -1}
+    :desc ["The $CIV have begun to establish permanent colonies on worlds "
+           "other than $PLANET. Although still largely unable to travel "
+           "outside of the $SYSTEM system, the distribution of $CIV "
+           "civilization across multiple worlds greatly reduces the risk "
+           "that they will collapse due to any crisis of merely planetary "
+           "scale."]}
+
    {:name :quantum-computers
     :prereqs #{:networked-computers :quantum-physics}
     :desc ["The $CIV have constructed their first cost-effective quantum "
@@ -285,6 +296,15 @@
            "perform certain types of calculation."]}
 
    {:name :FTL-communication
-    :prereqs #{:quantum-computers}
-    :desc ["The $CIV have discovered a means of sending and receiving "
-           "messages at faster-than-light speeds."]}])
+    :prereqs #{:artificial-intelligence :quantum-computers}
+    :desc ["Through their investigations of quantum phenomena, the $CIV have "
+           "discovered a means of sending and receiving messages which travel "
+           "at speeds exceeding that of light itself."]}
+
+   {:name :FTL-travel
+    :prereqs #{:FTL-communication :space-colonization}
+    :set-vars {:state :pending-invite}
+    :desc ["The $CIV have successfully tested their first faster-than-light "
+           "starship. No longer are they trapped within the gravity well of "
+           "the $SYSTEM system: they are now free to take their place "
+           "alongside us as fellow wanderers among the stars."]}])

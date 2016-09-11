@@ -38,6 +38,15 @@
       (update :event-chances #(merge-with + % (:event-chances event)))
       (merge (:set-vars event))))
 
+(defn invite [civ stardate]
+  (-> civ
+      (assoc :state :joined)
+      (dissoc :event-chances)
+      (update :events conj
+        {:desc (make-description civ
+                 {:desc ["In $STARDATE, the $CIV joined us."]}
+                 stardate)})))
+
 ;;; generate civs
 
 (def all-traits
@@ -73,6 +82,7 @@
         system (gen-caps-name)
         planet (gen-caps-name)]
     {:name species
+     :state :normal
      :language language
      :knowledge #{}
      :events [{:desc (str "We first became aware of the " species " in " stardate ". "
@@ -113,7 +123,7 @@
        (shuffle)))
 
 (defn possible-techs [civ]
-  (when-not (:extinct? civ)
+  (when (= (:state civ) :normal)
     (->> all-techs
          (remove #(contains? (:knowledge civ) (:name %)))
          (filter #(has-prereqs? civ %)))))
@@ -130,7 +140,11 @@
           (rand-nth techs))))))
 
 (defn civ-tick [civ stardate]
-  (if (:extinct? civ)
-    (update civ :cycles-since-extinction (fnil inc 0))
-    (let [event (maybe-select-event civ)]
-      (cond-> civ event (process-event event stardate)))))
+  (case (:state civ)
+    :extinct
+      (update civ :cycles-since-extinction (fnil inc 0))
+    :normal
+      (let [event (maybe-select-event civ)]
+        (cond-> civ event (process-event event stardate)))
+    ;else
+      civ))

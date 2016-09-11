@@ -1,6 +1,6 @@
 (ns epitaph.app
   (:require [clojure.string :as str]
-            [epitaph.civs :refer [civ-tick gen-civ possible-techs process-event]]
+            [epitaph.civs :refer [civ-tick gen-civ invite possible-techs process-event]]
             [om.core :as om]
             [om-tools.core :refer-macros [defcomponent]]
             [om-tools.dom :as dom]))
@@ -30,8 +30,8 @@
   (cond
     (> (count new-civs) (count old-civs))
       (:notification-pitch (peek new-civs))
-    (> (count (filter :extinct? new-civs))
-       (count (filter :extinct? old-civs)))
+    (> (count (filter #(= (:state %) :extinct) new-civs))
+       (count (filter #(= (:state %) :extinct) old-civs)))
       "C3"
     :else
       (let [civs-with-new-events
@@ -47,8 +47,8 @@
     (fn [state]
       (let [new-stardate (inc (:stardate state))
             civs (mapv #(civ-tick % new-stardate) (:civs state))
-            ;; new civs more likely to spawn if all existing civs are extinct
-            new-civ-chance (if (every? :extinct? civs) (/ 1 15) (/ 1 180))
+            ;; new civs more likely to spawn if all existing civs are "finished"
+            new-civ-chance (if (every? #(not= (:state %) :normal) civs) (/ 1 15) (/ 1 180))
             civs (cond-> civs (< (rand) new-civ-chance)
                               (conj (gen-civ new-stardate)))]
         (when-let [pitch (get-notification-pitch (:civs state) civs)]
@@ -61,8 +61,8 @@
 
 (defcomponent civ-view [data owner]
   (render [_]
-    (dom/div {:class (cond-> "civ" (:extinct? data) (str " extinct"))
-              :style {:opacity (when (:extinct? data)
+    (dom/div {:class (str "civ " (name (:state data)))
+              :style {:opacity (when (= (:state data) :extinct)
                                  (-> (:cycles-since-extinction data)
                                      (scale [0 (+ 160 (* 20 (count (:events data))))]
                                             [0.75 0.1])
@@ -74,29 +74,42 @@
       (dom/div {:class "events"}
         (om/build-all event-view (:events data)))
       ;; enlighten
-      (when (seq (possible-techs data))
-        (let [date (:stardate data)
-              date-allowed-to-intervene (+ (:last-intervened data) 30)]
+      (case (:state data)
+        :normal
+          (when (seq (possible-techs data))
+            (let [date (:stardate data)
+                  date-allowed-to-intervene (+ (:last-intervened data) 30)]
+              (dom/div {:class "enlighten"}
+                (if (< date date-allowed-to-intervene)
+                  (dom/p {}
+                    "We have recently interfered with the development of "
+                    (:name data) " civilization. Further interference is forbidden"
+                    " until " date-allowed-to-intervene ".")
+                  (dom/p {}
+                    "We could teach them the secrets of "
+                    (for [part (interpose ", or of " (possible-techs data))]
+                      (if (map? part)
+                        (let [tech part]
+                          (dom/a {:href "#"
+                                  :on-click (fn [e]
+                                              (.preventDefault e)
+                                              (play-notification-sound! (:notification-pitch data))
+                                              (om/transact! data []
+                                                #(-> (process-event % tech date)
+                                                     (assoc :last-intervened date))))}
+                            (str/replace (name (:name tech)) #"-" " ")))
+                        (dom/span part))))))))
+        :pending-invite
           (dom/div {:class "enlighten"}
-            (if (< date date-allowed-to-intervene)
-              (dom/p {}
-                "We have recently interfered with the development of "
-                (:name data) " civilization. Further interference is forbidden"
-                " until " date-allowed-to-intervene ".")
-              (dom/p {}
-                "We could teach them the secrets of "
-                (for [part (interpose ", or of " (possible-techs data))]
-                  (if (map? part)
-                    (let [tech part]
-                      (dom/a {:href "#"
-                              :on-click (fn [e]
-                                          (.preventDefault e)
-                                          (play-notification-sound! (:notification-pitch data))
-                                          (om/transact! data []
-                                            #(-> (process-event % tech date)
-                                                 (assoc :last-intervened date))))}
-                        (str/replace (name (:name tech)) #"-" " ")))
-                    (dom/span part)))))))))))
+            (dom/p {:class "invite"}
+              "We could "
+              (dom/a {:on-click (fn [e]
+                                  (.preventDefault e)
+                                  (om/transact! data [] #(invite % (:stardate %))))}
+                "invite them in")
+              "."))
+        ;else
+          nil))))
 
 (defcomponent app [data owner]
   (render [_]
