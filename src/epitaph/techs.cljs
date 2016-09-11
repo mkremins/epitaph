@@ -106,7 +106,7 @@
            "mathematics, such as arithmetic, algebra, and geometry."]}
 
    {:name :sailing
-    :prereqs #{:astronomy :construction :fishing}
+    :prereqs #{:astronomy :construction}
     :event-chances {:sea-plague (/ +2 1000)
                     :large-city (/ +1 1000)
                     :war-over-metal (/ -2 1000)
