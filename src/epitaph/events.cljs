@@ -221,4 +221,78 @@
                            ["armor" "ceramics" "clothing" "fabrics" "glassware"
                             "jewelry" "pottery" "textiles" "weapons"])]
                (str stuff " produced there "
-                    (if (= (last stuff) "s") "are" "is")))}}})
+                    (if (= (last stuff) "s") "are" "is")))}}
+
+    ;; late-game events
+
+    :bioterrorism
+    {:name :bioterrorism
+     :set-vars {:state :extinct}
+     :desc ["In $STARDATE, a genetically engineered virus designed as a "
+            "highly lethal weapon of biological warfare was deliberately "
+            "distributed in several major centers of $CIV population by an "
+            "agent or agents of unknown affiliation. $CIV medical science "
+            "proved insufficient to combat the ensuing plague, which wiped "
+            "out all but a few isolated pockets of $CIV population and "
+            "brought an end to the era of $CIV technological civilization."]}
+
+    :world-government
+    {:name :world-government
+     :event-chances {:nuclear-war -1}
+     :desc ["In $STARDATE, following decades of negotiation, the various "
+            "sovereign $CIV nations came to an agreement concerning the "
+            "establishment of a unified planet-wide government for all of the "
+            "$CIV."]}
+
+    :nuclear-weapons
+    {:name :nuclear-weapons
+     :prereqs #{:flight :nuclear-physics :rocketry}
+     :event-chances {:nuclear-strike (/ +1 180)
+                     :nuclear-war (/ +1 180)
+                     :skynet (/ +1 500)}
+     :desc ["In $STARDATE, the $CIV successfully detonated their first "
+            "prototype nuclear weapon. It remains unclear whether the $CIV "
+            "scientists who worked on the bomb understand the sheer "
+            "destructive potential of the weapon they have created."]}
+
+    :nuclear-strike
+    {:name :nuclear-strike
+     :event-chances {:nuclear-war (/ +1 360)}
+     :desc ["In $STARDATE, a single nuclear weapon was deployed in an attack "
+            "on a $SIZE $CIV city. The incident did not escalate into "
+            "a full-scale nuclear war, but the city was almost completely "
+            "obliterated, resulting in the deaths of some $POP,000 $CIV."]
+     :vocab {"$SIZE" ["small" "medium-sized" "large" "major"]
+             "$POP" #(+ (rand-int 200) 50)}}
+
+    :nuclear-war
+    {:name :nuclear-war
+     :set-vars {:state :extinct}
+     :desc ["In $STARDATE, an early warning system employed by one of the "
+            "major $CIV superpowers detected an incoming nuclear attack. "
+            "Whether the alert was a false alarm remains unclear, but the "
+            "resulting nuclear counterattack and ensuing full-scale nuclear "
+            "war has plunged $PLANET into a state of nuclear winter from "
+            "which it is unlikely that $CIV civilization will ever recover."]}
+
+    :skynet
+    {:name :skynet
+     :prereqs #{:artificial-intelligence}
+     :set-vars {:state :extinct}
+     :desc ["In $STARDATE, an artificially intelligent agent with command "
+            "authority over the military forces of a major $CIV nation "
+            "spontaneously turned against its $CIV masters. Within weeks, the "
+            "thoroughly unprepared $CIV were all but exterminated in a "
+            "seemingly endless wave of attacks by brutally efficient military "
+            "machines."]}
+
+    :gray-goo
+    {:name :gray-goo
+     :set-vars {:state :extinct}
+     :desc ["In $STARDATE, a swarm of self-replicating $CIV nanobots began to "
+            "replicate uncontrollably, devouring vast swaths of $PLANET at a "
+            "rate which $CIV scientists had formerly deemed impossible. After "
+            "several days of rapid expansion, the swarm seems to have become "
+            "dormant, but not before consuming approximately 5% of the entire "
+            "mass of $PLANET and rendering $CIV civilization completely "
+            "extinct."]}})

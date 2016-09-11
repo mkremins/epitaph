@@ -8,8 +8,15 @@
                     :food-illness (/ +1 1000)
                     :pets (/ +3 1000)
                     :conqueror (/ +1 1000)}
-    :desc ["The $CIV use stone tools for many things, including as weapons "
-           "when hunting the wild $BEAST."]}
+    :desc ["The $CIV $USE stone tools $FOR$JOINER hunting the wild $BEAST."]
+    :vocab {"$USE" ["make extensive use of" "make use of"
+                    "make widespread use of" "use"]
+            "$FOR" ["for many things"
+                    "in a variety of contexts"]
+            "$JOINER" [", especially when"
+                       ", including as weapons when"
+                       ", including when"
+                       ". This has dramatically improved their efficiency in"]}}
 
    {:name :agriculture
     :event-chances {:overhunting (/ -3 1000)
@@ -234,8 +241,16 @@
             "$IDEA" ["hypothesis" "idea" "theory"]
             "$ARE" ["are" "can be"]}}
 
+   {:name :genetics
+    :prereqs #{:germ-theory}
+    :event-chances {:bioterrorism (/ +1 500)}
+    :desc ["The $CIV have arrived at a sophisticated understanding of "
+           "genetics, which has enabled them to craft new forms of life by "
+           "deliberately modifying the genes of existing organisms."]}
+
    {:name :nuclear-physics
     :prereqs #{:calculus :telegraphy}
+    :event-chances {:nuclear-weapons (/ +1 60)}
     :desc ["The $CIV have developed an accurate model of the internal "
            "structure of the atom, which has also enabled them to understand "
            "the phenomenon of radioactivity."]}
@@ -257,6 +272,7 @@
 
    {:name :spaceflight
     :prereqs #{:digital-computers :flight :rocketry}
+    :event-chances {:asteroid (/ -1 2000)}
     :desc ["The $CIV have taken their first tentative steps into space, "
            "launching craft capable of supporting several individuals into "
            "orbit around $PLANET before retrieving them safely."]}
@@ -264,17 +280,20 @@
    {:name :networked-computers
     :prereqs #{:digital-computers :mass-media}
     :set-vars {:tech-chance (/ 1 15)}
+    :event-chances {:world-government (/ +1 180)}
     :desc ["The $CIV have begun to connect their computers into a single vast "
            "network, enabling communication and collaboration on a truly "
            "global scale."]}
 
    {:name :artificial-intelligence
     :prereqs #{:networked-computers}
+    :event-chances {:skynet (/ +1 500)}
     :desc ["The $CIV have developed a form of artificial general intelligence "
            "which rivals many of their own intellectual capabilities."]}
 
    {:name :nanotechnology
     :prereqs #{:networked-computers :quantum-physics}
+    :event-chances {:gray-goo (/ +1 500)}
     :desc ["The $CIV have begun to experiment with the use of \"intelligent "
            "materials\", in the form of swarms of programmable nanobots."]}
 
