@@ -243,20 +243,20 @@
 
    {:name :genetics
     :prereqs #{:germ-theory}
-    :event-chances {:bioterrorism (/ +1 500)}
+    :event-chances {:bioterrorism (/ +1 360)}
     :desc ["The $CIV have arrived at a sophisticated understanding of "
            "genetics, which has enabled them to craft new forms of life by "
            "deliberately modifying the genes of existing organisms."]}
 
    {:name :nuclear-physics
-    :prereqs #{:calculus :telegraphy}
-    :event-chances {:nuclear-weapons (/ +1 60)}
+    :prereqs #{:calculus :gunpowder :telegraphy}
+    :event-chances {:nuclear-weapons (/ +1 30)}
     :desc ["The $CIV have developed an accurate model of the internal "
            "structure of the atom, which has also enabled them to understand "
            "the phenomenon of radioactivity."]}
 
    {:name :mass-media
-    :prereqs #{:telegraphy :calculus}
+    :prereqs #{:calculus :telegraphy}
     :desc ["The $CIV have discovered that electromagnetic waves may be used "
            "to transmit information, enabling the development and widespread "
            "deployment of media for audiovisual broadcasting."]}
@@ -279,28 +279,29 @@
 
    {:name :networked-computers
     :prereqs #{:digital-computers :mass-media}
-    :set-vars {:tech-chance (/ 1 15)}
-    :event-chances {:world-government (/ +1 180)}
+    :set-vars {:tech-chance (/ 1 20)}
+    :event-chances {:world-government (/ +1 90)}
     :desc ["The $CIV have begun to connect their computers into a single vast "
            "network, enabling communication and collaboration on a truly "
            "global scale."]}
 
    {:name :artificial-intelligence
     :prereqs #{:networked-computers}
-    :event-chances {:skynet (/ +1 500)}
+    :event-chances {:skynet (/ +1 180)}
     :desc ["The $CIV have developed a form of artificial general intelligence "
            "which rivals many of their own intellectual capabilities."]}
 
    {:name :nanotechnology
     :prereqs #{:networked-computers :quantum-physics}
-    :event-chances {:gray-goo (/ +1 500)}
+    :event-chances {:gray-goo (/ +1 180)}
     :desc ["The $CIV have begun to experiment with the use of \"intelligent "
            "materials\", in the form of swarms of programmable nanobots."]}
 
    {:name :space-colonization
     :prereqs #{:nanotechnology :networked-computers :spaceflight}
     :event-chances {:asteroid -1
-                    :volcano -1}
+                    :volcano -1
+                    :world-government (/ +2 90)}
     :desc ["The $CIV have begun to establish permanent colonies on worlds "
            "other than $PLANET. Although still largely unable to travel "
            "outside of the $SYSTEM system, the distribution of $CIV "

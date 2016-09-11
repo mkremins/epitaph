@@ -247,9 +247,9 @@
     :nuclear-weapons
     {:name :nuclear-weapons
      :prereqs #{:flight :nuclear-physics :rocketry}
-     :event-chances {:nuclear-strike (/ +1 180)
-                     :nuclear-war (/ +1 180)
-                     :skynet (/ +1 500)}
+     :event-chances {:nuclear-strike (/ +1 90)
+                     :nuclear-war (/ +1 90)
+                     :skynet (/ +1 90)}
      :desc ["In $STARDATE, the $CIV successfully detonated their first "
             "prototype nuclear weapon. It remains unclear whether the $CIV "
             "scientists who worked on the bomb understand the sheer "
@@ -257,7 +257,7 @@
 
     :nuclear-strike
     {:name :nuclear-strike
-     :event-chances {:nuclear-war (/ +1 360)}
+     :event-chances {:nuclear-war (/ +1 90)}
      :desc ["In $STARDATE, a single nuclear weapon was deployed in an attack "
             "on a $SIZE $CIV city. The incident did not escalate into "
             "a full-scale nuclear war, but the city was almost completely "
