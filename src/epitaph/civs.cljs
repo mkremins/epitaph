@@ -36,7 +36,7 @@
       (update :knowledge conj (:name event))
       (update :events conj {:desc (make-description civ event stardate)})
       (update :event-chances #(merge-with + % (:event-chances event)))
-      (cond-> (:extinction? event) (assoc :extinct? true))))
+      (merge (:set-vars event))))
 
 ;;; generate civs
 
@@ -93,6 +93,7 @@
              "$PLANET" planet
              "$RELIGION" (gen-caps-word)
              "$SYSTEM" system}
+     :tech-chance (/ 1 90)
      :event-chances {:asteroid (/ +1 1000)
                      :volcano (/ +1 1000)
                      :food-illness (/ +1 1000)
@@ -125,7 +126,7 @@
         (recur (rest event-chances)))
       ;; if no event selected, maybe (1/100 chance) select a tech
       (let [techs (possible-techs civ)]
-        (when (and (seq techs) (< (rand) (/ 1 100)))
+        (when (and (seq techs) (< (rand) (:tech-chance civ)))
           (rand-nth techs))))))
 
 (defn civ-tick [civ stardate]

@@ -5,7 +5,7 @@
 
    :asteroid
    {:name :asteroid
-    :extinction? true
+    :set-vars {:extinct? true}
     :desc ["In $STARDATE, $PLANET collided with a $ADJ $OBJ, resulting in a "
            "mass extinction event which wiped out all traces of $CIV "
            "civilization."]
@@ -14,7 +14,7 @@
 
    :volcano
    {:name :volcano
-    :extinction? true
+    :set-vars {:extinct? true}
     :desc ["In $STARDATE, a massive volcanic eruption filled the skies of "
            "$PLANET with ash and blotted out the sun. The ensuing volcanic "
            "winter threw the planet's delicate ecosystem wildly out of "
@@ -22,7 +22,7 @@
 
    :gamma-ray-burst
    {:name :gamma-ray-burst
-    :extinction? true
+    :set-vars {:extinct? true}
     :desc ["In $STARDATE, a gamma-ray burst – caused by the explosion of a "
            "star roughly $DIST $UNIT from the $SYSTEM system – showered "
            "$PLANET in high energy electromagnetic radiation. The planet's "
@@ -35,7 +35,7 @@
 
    :food-illness
    {:name :food-illness
-    :extinction? true
+    :set-vars {:extinct? true}
     :desc ["In $STARDATE, a food-borne illness began to spread rapidly through "
            "the $CIV population. Less than 10% of the $CIV survived the plague, "
            "causing a population bottleneck which eventually brought about the "
@@ -45,7 +45,7 @@
 
    :overhunting
    {:name :overhunting
-    :extinction? true
+    :set-vars {:extinct? true}
     :desc ["Due to the extreme effectiveness of stone tools in hunting $BEAST, "
            "the $CIV managed to hunt the $BEAST species to extinction. Being "
            "reliant on the $BEAST for food, the $CIV then suffered a famine "
@@ -53,7 +53,7 @@
 
    :overfishing
    {:name :overfishing
-    :extinction? true
+    :set-vars {:extinct? true}
     :desc ["As the $CIV population increased, they began to overfish the waters "
            "of $PLANET. By $STARDATE, they had driven the $FISH species to "
            "extinction. The ensuing famine brought about a total collapse of "
@@ -61,7 +61,7 @@
 
    :crop-failure
    {:name :crop-failure
-    :extinction? true
+    :set-vars {:extinct? true}
     :desc ["In $STARDATE, a combination of $ADJ weather and pestilence caused "
            "a near-total failure of the $CROP crop. Being overreliant on $CROP "
            "cultivation for food, the $CIV then suffered a massive famine which "
@@ -72,7 +72,7 @@
 
    :forest-fire
    {:name :forest-fire
-    :extinction? true
+    :set-vars {:extinct? true}
     :desc ["In $STARDATE, a cooking fire started by one of the $CIV jumped to "
            "the forest, where it quickly blazed out of control. When the fire "
            "finally burned itself out, the forest had been almost completely "
@@ -81,7 +81,7 @@
 
    :war-over-metal
    {:name :war-over-metal
-    :extinction? true
+    :set-vars {:extinct? true}
     :desc ["In $STARDATE, due to the growing importance of metal-forged weapons "
            "in warfare and the scarcity of metal deposits on $PLANET, a massive "
            "and bloody conflict erupted over control of these deposits. Over 80% "
@@ -90,7 +90,7 @@
 
    :city-plague
    {:name :city-plague
-    :extinction? true
+    :set-vars {:extinct? true}
     :desc ["In $STARDATE, a virulent new plague spread swiftly through the "
            "largest and densest centers of $CIV population. Living in such "
            "close proximity, the city-dwelling $CIV were almost entirely wiped "
@@ -99,7 +99,7 @@
 
    :sea-plague
    {:name :sea-plague
-    :extinction? true
+    :set-vars {:extinct? true}
     :desc ["In $STARDATE, a number of $CIV $PEOPLE returned from across the sea "
            "bearing symptoms of an unfamiliar illness. Having no immunity to "
            "the germs that caused the disease, the majority of the $CIV "

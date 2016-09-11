@@ -44,6 +44,7 @@
     :vocab {"$AN_IMPORTANT" ["an important" "a staple"]}}
 
    {:name :writing
+    :set-vars {:tech-chance (/ 1 60)}
     :event-chances {:war-over-metal (/ -1 1000)
                     :conqueror (/ +3 1000)
                     :religion (/ +1 1000)}
@@ -74,7 +75,7 @@
    {:name :construction
     :prereqs #{:toolmaking :agriculture}
     :event-chances {:large-city (/ +1 1000)
-                    :city-plague (/ +2 1000)
+                    :city-plague (/ +2.5 1000)
                     :war-over-metal (/ -1 1000)
                     :forest-fire (/ -2 1000)
                     :conqueror (/ +2 1000)
@@ -141,6 +142,7 @@
 
    {:name :the-printing-press
     :prereqs #{:architecture :metalworking}
+    :set-vars {:tech-chance (/ 1 30)}
     :desc ["The $CIV have developed a simple printing press, and mass-produced "
            "versions of important texts have begun to circulate widely "
            "throughout the world. $TEXTS_ARE especially popular."]
@@ -184,17 +186,19 @@
     :desc ["electromagnetism"]}
 
    {:name :telegraphy
-    :prereqs #{:electromagnetism}
+    :prereqs #{:electromagnetism :steam-power}
     :desc ["telegraphy"]}
 
    {:name :transistors
-    :prereqs #{:electromagnetism}
+    :prereqs #{:electromagnetism :calculus :steam-power}
     :desc ["transistors"]}
 
    {:name :germ-theory
-    :prereqs #{:taxonomy}
+    :prereqs #{:calculus :taxonomy}
+    :event-chances {:city-plague (/ -1 1000)
+                    :sea-plague (/ -1 1000)}
     :desc ["germ-theory"]}
 
    {:name :mass-media
-    :prereqs #{:telegraphy}
+    :prereqs #{:telegraphy :calculus}
     :desc ["mass-media"]}])
