@@ -137,8 +137,8 @@
     :vocab {"$ADJ" ["disparate" "fractious" "warring"]
             "$CLANS" ["city-states" "clans" "kingdoms" "tribes" "villages"]
             "$NEW_EMPIRE" ["The resulting empire has its capital at $CITY and"
-                           "The city of $CITY $IS_MADE the capital of the resulting empire, which"]
-            "$IS_MADE" ["becomes" "is declared" "is made" "is named"]
+                           "The city of $CITY $WAS_MADE the capital of the resulting empire, which"]
+            "$WAS_MADE" ["has become" "has been declared" "has been made" "has been named"]
             "$PERCENT" #(+ 5 (rand-int 40))
             "$AS_USUAL" ["Like many other $CIV states" "Unusually for the $CIV"]
             "$GOV" ["a council of $LEADERS" "a hereditary monarch"
