@@ -96,7 +96,10 @@
      :vocab {"$BEAST" (gen-word language)
              "$CITY" (gen-caps-name)
              "$CIV" species
-             "$CONQUEROR" (gen-caps-name)
+             "$CONQUEROR" (str (gen-caps-name)
+                               (when (> (rand) 0.5)
+                                 (str " the "
+                                      (rand-nth ["Conqueror" "Great" "Magnificent" "Merciful" "Ruthless"]))))
              "$CROP" (gen-word language)
              "$FISH" (gen-word language)
              "$PET" (gen-word language)

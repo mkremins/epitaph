@@ -100,14 +100,15 @@
                             (str/replace (name (:name tech)) #"-" " ")))
                         (dom/span part))))))))
         :pending-invite
-          (dom/div {:class "enlighten"}
-            (dom/p {:class "invite"}
-              "We could "
-              (dom/a {:on-click (fn [e]
-                                  (.preventDefault e)
-                                  (om/transact! data [] #(invite % (:stardate %))))}
-                "invite them in")
-              "."))
+          (let [date (:stardate data)]
+            (dom/div {:class "enlighten"}
+              (dom/p {:class "invite"}
+                "We could "
+                (dom/a {:on-click (fn [e]
+                                    (.preventDefault e)
+                                    (om/transact! data [] #(invite % date)))}
+                  "invite them in")
+                ".")))
         ;else
           nil))))
 

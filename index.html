@@ -54,6 +54,9 @@
   .enlighten a {
     color: red;
   }
+  .enlighten .invite a {
+    color: cyan;
+  }
   .enlighten a:last-child:after {
     color: #eee;
     content: ".";
@@ -63,7 +66,7 @@
     margin-bottom: 1rem;
   }
   @keyframes new-event {
-    from { color: yellow; } to { color: #eee; }
+    from { color: yellow; } to { color: inherit; }
   }
   .system {
     font-style: italic;
