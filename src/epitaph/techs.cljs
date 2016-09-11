@@ -62,8 +62,11 @@
     :prereqs #{:toolmaking}
     :event-chances {:forest-fire (/ +2 1000)
                     :food-illness (/ -3 1000)}
-    :desc ["The $CIV have mastered the control of fire. They use it to cook "
-           "their food, and to light their villages at night."]}
+    :desc ["$INTRO $CIV have mastered the control of fire. They use it to "
+           "cook their food, and to light their villages at night."]
+    :vocab {"$INTRO" ["$DESPITE a few $EARLY mishaps, the" "The" "The"]
+            "$DESPITE" ["Despite" "In spite of"]
+            "$EARLY" ["early" "initial"]}}
 
    {:name :metalworking
     :prereqs #{:fire}
@@ -201,4 +204,13 @@
 
    {:name :mass-media
     :prereqs #{:telegraphy :calculus}
-    :desc ["mass-media"]}])
+    :desc ["mass-media"]}
+
+   {:name :digital-computers
+    :prereqs #{:transistors}
+    :desc ["digital-computers"]}
+
+   {:name :networked-computers
+    :prereqs #{:digital-computers :mass-media}
+    :set-vars {:tech-chance (/ 1 15)}
+    :desc ["networked-computers"]}])
