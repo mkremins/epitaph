@@ -238,7 +238,9 @@
 
     :world-government
     {:name :world-government
-     :event-chances {:nuclear-war -1}
+     :event-chances {:nuclear-weapons -1
+                     :nuclear-strike -1
+                     :nuclear-war -1}
      :desc ["In $STARDATE, following decades of negotiation, the various "
             "sovereign $CIV nations came to an agreement concerning the "
             "establishment of a unified planet-wide government for all of the "
