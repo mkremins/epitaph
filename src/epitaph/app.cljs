@@ -115,11 +115,11 @@
 (defcomponent app [data owner]
   (render [_]
     (dom/div {:class "app"}
-      (dom/p {:class "stardate"}
-        (dom/span (str "Stardate " (:stardate data))))
-      (dom/div {:class "right"}
-        (dom/a {:class (if (:sound-on? data) "icon-sound-on" "icon-sound-off")
-                :on-click #(om/transact! data :sound-on? not)}))
+      (dom/div {:class "top-bar"}
+        (dom/p {} (str "Stardate " (:stardate data)))
+        (dom/div {:class "right"}
+          (dom/a {:class (if (:sound-on? data) "icon-sound-on" "icon-sound-off")
+                  :on-click #(om/transact! data :sound-on? not)})))
       (dom/div {:class "civs"}
         (om/build-all civ-view
           (->> (:civs data)
