@@ -7,7 +7,9 @@
   :cljsbuild {:builds [{:id "app"
                         :source-paths ["src"]
                         :compiler {:main epitaph.app
-                                   :optimizations :none
+                                   :optimizations :advanced
                                    :output-dir "target/app"
                                    :output-to "target/app.js"
-                                   :source-map true}}]})
+                                   :externs ["externs/tone.js"]
+                                   ;:source-map true
+                                   }}]})
