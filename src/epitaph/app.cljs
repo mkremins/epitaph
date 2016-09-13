@@ -98,7 +98,8 @@
                                                 #(-> (process-event % tech date)
                                                      (assoc :last-intervened date))))}
                             (str/replace (name (:name tech)) #"-" " ")))
-                        (dom/span part))))))))
+                        (dom/span part)))
+                    ".")))))
         :pending-invite
           (let [date (:stardate data)]
             (dom/div {:class "enlighten"}
