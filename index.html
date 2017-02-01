@@ -38,6 +38,9 @@
     right: 1rem;
     top: 1rem;
   }
+  .top-bar .right > :not(:last-child) {
+    margin-right: 0.5rem;
+  }
   .civ {
     -webkit-animation: new-event 5s linear;
     -o-animation: new-event 5s linear;
@@ -83,6 +86,41 @@
     .civ p { font-size: 0.9375rem; }
   }
 
+  /*** infobox/modal overlay ***/
+
+  .modal-overlay {
+    background-color: #000; /*solid black fallback*/
+    background-color: rgba(0,0,0,0.85);
+    height: 100%;
+    left: 0;
+    overflow-y: scroll;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 2000;
+  }
+  .info-box {
+    background-color: #222;
+    margin: 0 auto;
+    max-width: 560px;
+    padding: 2rem;
+    position: relative;
+    top: 25%;
+    width: 70%;
+  }
+  .info-box h2, .info-box p, .info-box ul {
+    margin-bottom: 1rem;
+  }
+  .info-box ul {
+    margin-left: 1rem;
+  }
+  .info-box a:not(.icon-cross) {
+    color: red;
+  }
+  @media (max-width: 480px) {
+    .info-box { top: 1.5rem; width: 90%; }
+  }
+
   /*** Icomoon icons ***/
 
   @font-face {
@@ -116,6 +154,12 @@
   }
   .icon-sound-off:before {
     content: "\ea2a";
+  }
+  .icon-info:before {
+    content: "\ea0c";
+  }
+  .icon-cross:before {
+    content: "\ea0f";
   }
   </style>
 </head>

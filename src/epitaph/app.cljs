@@ -113,14 +113,48 @@
         ;else
           nil))))
 
+(defcomponent info-box [data owner]
+  (render [_]
+    (dom/div {:class "modal-overlay"
+              :on-click #(om/update! data :show-info? false)}
+      (dom/div {:class "info-box"
+                :on-click #(.stopPropagation %)}
+        (dom/div {:class "right"}
+          (dom/a {:class "icon-cross"
+                  :on-click #(om/update! data :show-info? false)}))
+        (dom/h2 "About")
+        (dom/p {}
+          "Hi! I’m "
+          (dom/a {:href "https://mkremins.github.io"} "Max Kreminski")
+          ", the creator of Epitaph. If you enjoyed playing Epitaph, you can:")
+        (dom/ul {}
+          (dom/li {}
+            "Follow me on "
+            (dom/a {:href "https://twitter.com/maxkreminski"} "Twitter")
+            " or "
+            (dom/a {:href "https://mkremins.itch.io"} "itch.io")
+            " for updates on this and other projects")
+          (dom/li {}
+            "Support me by "
+            (dom/a {:href "https://mkremins.itch.io/epitaph"} "making a donation")
+            " on itch.io")
+          (dom/li {}
+            "Check out the game’s "
+            (dom/a {:href "https://github.com/mkremins/epitaph"} "source code")))
+        (dom/p {} "Thanks for playing!")))))
+
 (defcomponent app [data owner]
   (render [_]
     (dom/div {:class "app"}
+      (when (:show-info? data)
+        (om/build info-box data))
       (dom/div {:class "top-bar"}
         (dom/p {} (str "Stardate " (:stardate data)))
         (dom/div {:class "right"}
           (dom/a {:class (if (:sound-on? data) "icon-sound-on" "icon-sound-off")
-                  :on-click #(om/transact! data :sound-on? not)})))
+                  :on-click #(om/transact! data :sound-on? not)})
+          (dom/a {:class "icon-info"
+                  :on-click #(om/update! data :show-info? true)})))
       (dom/div {:class "civs"}
         (om/build-all civ-view
           (->> (:civs data)
