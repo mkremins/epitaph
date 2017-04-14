@@ -137,7 +137,7 @@
             " for updates on this and other projects")
           (dom/li {}
             "Support me by "
-            (dom/a {:href "https://mkremins.itch.io/epitaph"} "making a donation")
+            (dom/a {:href "https://mkremins.itch.io/epitaph/donate"} "making a donation")
             " on itch.io")
           (dom/li {}
             "Check out the game’s "

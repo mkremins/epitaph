@@ -655,7 +655,7 @@ return React.DOM.a(G__21516,G__21517);
 })()," or ",(function (){var G__21518 = ({"href": "https://mkremins.itch.io"});
 var G__21519 = "itch.io";
 return React.DOM.a(G__21518,G__21519);
-})()," for updates on this and other projects"],null)))),cljs.core.apply.cljs$core$IFn$_invoke$arity$3(React.DOM.li,({}),cljs.core.flatten((new cljs.core.PersistentVector(null,3,(5),cljs.core.PersistentVector.EMPTY_NODE,["Support me by ",(function (){var G__21520 = ({"href": "https://mkremins.itch.io/epitaph"});
+})()," for updates on this and other projects"],null)))),cljs.core.apply.cljs$core$IFn$_invoke$arity$3(React.DOM.li,({}),cljs.core.flatten((new cljs.core.PersistentVector(null,3,(5),cljs.core.PersistentVector.EMPTY_NODE,["Support me by ",(function (){var G__21520 = ({"href": "https://mkremins.itch.io/epitaph/donate"});
 var G__21521 = "making a donation";
 return React.DOM.a(G__21520,G__21521);
 })()," on itch.io"],null)))),cljs.core.apply.cljs$core$IFn$_invoke$arity$3(React.DOM.li,({}),cljs.core.flatten((new cljs.core.PersistentVector(null,2,(5),cljs.core.PersistentVector.EMPTY_NODE,["Check out the game\u2019s ",(function (){var G__21522 = ({"href": "https://github.com/mkremins/epitaph"});
