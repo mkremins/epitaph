@@ -8,8 +8,10 @@
                         :source-paths ["src"]
                         :compiler {:main epitaph.app
                                    :optimizations :advanced
-                                   :output-dir "target/app"
-                                   :output-to "target/app.js"
+                                   :output-dir "docs/js/app"
+                                   :output-to "docs/js/app.js"
                                    :externs ["externs/tone.js"]
+                                   :foreign-libs [{:file "deps/tone.min.js"
+                                                   :provides ["tonejs"]}]
                                    ;:source-map true
                                    }}]})

@@ -3,7 +3,8 @@
             [epitaph.civs :refer [civ-tick gen-civ invite possible-techs process-event]]
             [om.core :as om]
             [om-tools.core :refer-macros [defcomponent]]
-            [om-tools.dom :as dom]))
+            [om-tools.dom :as dom]
+            [tonejs]))
 
 (def synth
   (.toMaster (js/Tone.Synth.)))
