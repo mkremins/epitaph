@@ -211,7 +211,7 @@
     :prereqs #{:large-city}
     :event-chances {:city-fortress -1
                     :city-holy -1}
-    :desc ["The city of $CITY has become renowed among the $CIV as a center of "
+    :desc ["The city of $CITY has become renowned among the $CIV as a center of "
            "commerce and trade. In particular, the $ADJ $STUFF_MADE_THERE_IS "
            "highly sought after by traders around the world."]
     :vocab {"$ADJ" ["delicate" "durable" "elegant" "fine" "high-quality"
