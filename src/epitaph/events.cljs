@@ -47,7 +47,7 @@
    {:name :overhunting
     :set-vars {:state :extinct}
     :desc ["Due to the extreme effectiveness of stone tools in hunting $BEAST, "
-           "the $CIV managed to hunt the $BEAST species to extinction. Being "
+           "the $CIV managed to hunt the $BEAST species to extinction by $STARDATE. Being "
            "reliant on the $BEAST for food, the $CIV then suffered a famine "
            "which brought about the end of $CIV civilization."]}
 
