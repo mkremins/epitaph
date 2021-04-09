@@ -301,6 +301,7 @@
     :prereqs #{:nanotechnology :networked-computers :spaceflight}
     :event-chances {:asteroid -1
                     :volcano -1
+                    :gray-goo -1
                     :world-government (/ +2 90)}
     :desc ["The $CIV have begun to establish permanent colonies on worlds "
            "other than $PLANET. Although still largely unable to travel "
